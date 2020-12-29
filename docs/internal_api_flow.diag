@@ -1,0 +1,15 @@
+title JWThenticator Internal REST
+
+participant Internal Microservice
+participant JWThenticator
+
+Internal Microservice->JWThenticator:POST /is_key_registered\n{"key": "hello_world"}
+Internal Microservice<-JWThenticator:200 OK\n{"success": false, "message": null}
+
+space
+Internal Microservice->JWThenticator:POST /register_key\n{"key": "hello_world", "identifier": "dcd3d76f-df97-41ef-8c9f-64c09eb35ab8"}
+Internal Microservice<-JWThenticator:201 ACCEPTED\n{"success": true, "message": null}
+
+space
+Internal Microservice->JWThenticator:POST /is_key_registered\n{"key": "hello_world"}
+Internal Microservice<-JWThenticator:200 OK\n{"success": true, "message": null}

@@ -1,0 +1,20 @@
+title JWThenticator With Direct Validation
+
+participant Client
+participant My Service
+participant JWThenticator
+
+Client->My Service:GET /protected_endpoint
+Client<-My Service:401 UNAUTHORIZED
+
+space
+Client->JWThenticator:POST /authenticate\n{"key": "hello_world", "identifier": "5bc5b56-75..."}
+Client<-JWThenticator:200 OK\n{"jwt":"eyJ0eXAi...", "refresh_token":"858c825cf..."}
+
+space
+Client->My Service:GET /protected_endpoint\nHeaders - Bearer: eyJ0eXAi...
+activate My Service
+My Service->JWThenticator:POST /validate\n{"jwt":"eyJ0eXAi..."}
+JWThenticator->My Service:200 OK\n{"success": true, "message": null}
+Client<-My Service:200 OK\n{"message": "Hello World!"}
+deactivate My Service

@@ -1,0 +1,331 @@
+openapi: "3.0.0"
+info:
+  title: JWThenticator
+  version: 1.0.0
+paths:
+
+  /:
+    get:
+      description: Index path, see that the server is up and responding.
+      operationId: check_health
+      responses:
+        "200":
+          description: Working
+
+
+  /health:
+    get:
+      description: Get request to see the server is responding. This is can be used by K8S health checks.
+      operationId: check_health
+      responses:
+        "200":
+          description: Working
+
+
+  /register_key:
+    post:
+      description: Register a new key to be used during authentication (`/authenticate`)
+      operationId: register_key
+      requestBody:
+        description: The key to register
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterKeyRequest"
+      responses:
+        "201":
+          description: Key registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BoolResponse"
+              examples:
+                success_response:
+                  value:
+                    {
+                      "success": true,
+                      "message": null
+                    }
+        "400":
+          description: Invalid request
+
+
+  /is_key_registered:
+    post:
+      description: Check if a key is registered
+      operationId: is_key_registered
+      requestBody:
+        description: The key to check if registered
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/KeyRequest"
+      responses:
+        "200":
+          description: Check completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BoolResponse"
+              examples:
+                key_is_registered:
+                  value:
+                    {
+                      "success": true,
+                      "message": null
+                    }
+                key_isnt_registered:
+                  value:
+                    {
+                      "success": false,
+                      "message": null
+                    }
+        "400":
+          description: Invalid request
+
+
+  /authenticate:
+    post:
+      description: Authenticate using a key.
+      operationId: authenticate
+      requestBody:
+        description: Authentication credentials
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthRequest"
+      responses:
+        "200":
+          description: Authentication successfull
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+              examples:
+                succesfull_auth_response:
+                  value:
+                    {
+                      "jwt": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ0b2tlbl9pZCI6IjkxOWY4OWI4OTBkYjRlNjg5MzA3YzgyYTQ1MjE5Yjg4IiwiaWRlbnRpZmllciI6ImhlbGxvIiwiaWF0IjoxNjAwNjc0ODk2LCJleHAiOjE2MDA2NzY2OTZ9.TRXxbCweJRQlaV_jm2TFlNftfrA0Q5qrPtnMZx_r3y2ZUxIbZQw07n01QM43MTew0Zq9ExftNZbCd0vol8XT7wMakZvZDPokd7Gt9vd5fANWr1LHM-nDx4RVUqA4TfSwPVROrxZjwannsNZ74TCAZMXbmv3p2ZguVRXMnBL1i5F2I8hAweMz26IFuQkfvhTLy5OA-WFVwAvo24X4cAfk2z-QvAcgcrtKNF66UhNCdUdyB7it2SoqNr0qo8GuZuZNB-ej8wM4n189vW_nrV1P2xf0hWyL4adpXZtOUB0gAngGETh4W2YM8sByAp7f2EeNSCwptflHPupvR9fce3ZuOw",
+                      "refresh_token": "858c825cf8b7acae130e1a88c836609da744be15e9d4f5435887d8282dec2a2f7ad3feb88bb0414f54c9f0ec572cd071e88f5ed9b9e64be33944a7933df50dd3"
+                    }
+        "400":
+          description: Invalid request
+        "403":
+          description: Key is invalid or expired
+
+
+  /refresh:
+    post:
+      description: Create a new JWT using a refresh token
+      operationId: refresh
+      requestBody:
+        description: Refresh token details
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefreshRequest"
+      responses:
+        "200":
+          description: New JWT created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+              examples:
+                successfull_refresh_response:
+                  value:
+                    {
+                      "jwt": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ0b2tlbl9pZCI6IjkxOWY4OWI4OTBkYjRlNjg5MzA3YzgyYTQ1MjE5Yjg4IiwiaWRlbnRpZmllciI6ImhlbGxvIiwiaWF0IjoxNjAwNjc0ODk2LCJleHAiOjE2MDA2NzY2OTZ9.TRXxbCweJRQlaV_jm2TFlNftfrA0Q5qrPtnMZx_r3y2ZUxIbZQw07n01QM43MTew0Zq9ExftNZbCd0vol8XT7wMakZvZDPokd7Gt9vd5fANWr1LHM-nDx4RVUqA4TfSwPVROrxZjwannsNZ74TCAZMXbmv3p2ZguVRXMnBL1i5F2I8hAweMz26IFuQkfvhTLy5OA-WFVwAvo24X4cAfk2z-QvAcgcrtKNF66UhNCdUdyB7it2SoqNr0qo8GuZuZNB-ej8wM4n189vW_nrV1P2xf0hWyL4adpXZtOUB0gAngGETh4W2YM8sByAp7f2EeNSCwptflHPupvR9fce3ZuOw",
+                      "refresh_token": null
+                    }
+        "400":
+          description: Invalid request
+        "403":
+          description: Invalid or expired refresh token
+
+
+  /validate:
+    post:
+      description: Validate refresh token
+      operationId: validate
+      requestBody:
+        description: The JWT to validate
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JWTValidateRequest"
+      responses:
+        "200":
+          description: JWT is valid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BoolResponse"
+              example:
+                jwt_is_valid:
+                  value:
+                    {
+                      "success": true,
+                      "message": null
+                    }
+        "400":
+          description: Invalid request
+        "401":
+          description: JWT is invalid (bad signature, couldn't decode, or expired)
+
+
+  /validate_request:
+    get:
+      description: Endpoint receives an empty request with authentication header, extracts JWT and validates it. This endpoint can be used with as an Nginx auth_request handler.
+      operationId: validate_request
+      responses:
+        "200":
+          description: JWT is valid
+        "401":
+          description: JWT is invalid (bad signature, couldn't decode, or expired)
+        "403":
+          description: Missing authentcation header or invalid request
+
+
+  /jwks:
+    get:
+      description: Get the industry standard JWKS (JSON Web Key Set) data.
+      operationId: jwks
+      responses:
+        "200":
+          description: The JWKS data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JWKSResponse"
+              examples:
+                example_jwks:
+                  value:
+                    {
+                      "e": "AQAB",
+                      "alg": "RS256",
+                      "use": "sig",
+                      "n": "re5LAvt2PxauKMPvog6Pqv1P32UN1sTbPCPuHMowDSPycAwSpPjgvyp3Ttax7dhZZDSm_FnBJWzyvNJcSc5rN9H-TFgozzEnMaoDH6gE6xeUgIZ4NMvk5X_4DwLFVG3U8ziFa_LBv7lB4cN4iHkOjCRKCiN2Gy-Eji7E2JcEWTceOa7jy5gz8vcGEphiB8grn3bAYj6Iqvtle_OzCGaryonSuk2-PVewhMjLSFVK5jwcHMp6sgYme7k2c5lKClrgn7QDpWxN0GUWX4vx_CMnRt_76KCzfGCAOUk4LsCsBgfPJ2UwUifJ5wVA-MPSTWifyyqhL9iioqrnvtvZ-7GTyQ",
+                      "x5c": [
+                          "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAre5LAvt2PxauKMPvog6P\nqv1P32UN1sTbPCPuHMowDSPycAwSpPjgvyp3Ttax7dhZZDSm/FnBJWzyvNJcSc5r\nN9H+TFgozzEnMaoDH6gE6xeUgIZ4NMvk5X/4DwLFVG3U8ziFa/LBv7lB4cN4iHkO\njCRKCiN2Gy+Eji7E2JcEWTceOa7jy5gz8vcGEphiB8grn3bAYj6Iqvtle/OzCGar\nyonSuk2+PVewhMjLSFVK5jwcHMp6sgYme7k2c5lKClrgn7QDpWxN0GUWX4vx/CMn\nRt/76KCzfGCAOUk4LsCsBgfPJ2UwUifJ5wVA+MPSTWifyyqhL9iioqrnvtvZ+7GT\nyQIDAQAB\n-----END PUBLIC KEY-----"
+                      ],
+                      "kty": "RSA"
+                  }
+
+
+components:
+  schemas:
+    KeyRequest:
+      type: object
+      required:
+        - key
+      properties:
+        key:
+          type: string
+          description: Key to check
+
+
+    RegisterKeyRequest:
+      type: object
+      required:
+        - key
+        - identifier
+      properties:
+        key:
+          type: string
+          description: Key to register
+        identifier:
+          type: string
+          format: uuid
+          description: A unique client identifier
+
+
+    AuthRequest:
+      type: object
+      required:
+        - key
+        - identifier
+      properties:
+        key:
+          type: string
+          description: Key used for authentication
+        identifier:
+          type: string
+          format: uuid
+          description: A unique client identifier
+
+    RefreshRequest:
+      type: object
+      required:
+        - refresh_token
+        - identifier
+      properties:
+        refresh_token:
+          type: string
+          description: Refresh token used to verify owner
+        identifier:
+          type: string
+          format: uuid
+          description: A unique client identifier
+
+    JWTValidateRequest:
+      type: object
+      required:
+        - jwt
+      properties:
+        jwt:
+          type: string
+          description: JWT to validate
+
+    TokenResponse:
+      type: object
+      required:
+        - jwt
+      properties:
+        jwt:
+          type: string
+          description: A valid JWT that can be used for access
+        refresh_token:
+          type: string
+          description: A token that can be used for refreshing JWT once it expires (without authenticating again)
+
+    BoolResponse:
+      type: object
+      required:
+        - result
+      properties:
+        result:
+          type: boolean
+        message:
+          type: string
+
+    JWKSResponse:
+      type: object
+      properties:
+        x5c:
+          type: array
+          items:
+            type: string
+          description: The x509 certificate chain
+        n:
+          type: string
+          format: bytes
+          description: Pem moduluos
+        e:
+          type: string
+          format: bytes
+          description: PEM exponent
+        alg:
+          type: string
+          description: The algorithm for the key
+        kty:
+          type: string
+          description: Key type
+        use:
+          type: string
+          description: How the key is meant to be used

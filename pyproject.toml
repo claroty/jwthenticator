@@ -1,0 +1,55 @@
+[tool.poetry]
+name = "jwthenticator"
+version = "1.0.0"
+description = "A cloud first service for key to JWT authentication library and server written in Python 3."
+authors = ["Guy Zylberberg <guyzyl@gmail.com>", "Claroty Open Source <opensource@claroty.com>"]
+license = "Apache-2.0"
+readme = "README.md"
+homepage = "https://github.com/claroty/jwthenticator"
+documentation = "https://github.com/claroty/jwthenticator"
+exclude = ["jwthenticator/tests"]
+
+
+[tool.poetry.dependencies]
+python = "^3.6"
+sqlalchemy = "^1.3"
+asyncalchemy = "^1.0.0"
+sqlalchemy-utils = "^0.36"
+pg8000 = "1.16.5"   # Constant due to - https://github.com/tlocke/pg8000/issues/53
+aiohttp = "^3.7"
+pyjwt = "^1.7"
+cryptography = "^3.3"   # Required for pyjwt
+marshmallow = "^3.10"
+marshmallow-dataclass = "^8.3"
+pycryptodomex = "^3.9"
+dataclasses = { version = "^0.7", python = "~3.6" }
+
+
+[tool.poetry.dev-dependencies]
+mypy = "^0.790"
+pylint = "^2.6"
+pytest = "^6.1"
+pytest-asyncio = "^0.14"
+pytest-aiohttp = "^0.3"
+freezegun = "^1.0"
+diagrams = "^0.17.0"
+
+
+[tool.pylint.message_control]
+disable = [
+    "missing-class-docstring",
+    "missing-function-docstring",
+    "missing-module-docstring",
+    "line-too-long",
+]
+
+
+[tool.pylint.typecheck]
+ignored-classes = [
+    "Session"
+]
+
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

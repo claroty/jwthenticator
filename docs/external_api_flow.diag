@@ -1,0 +1,23 @@
+title JWThenticator External REST
+
+participant Client
+participant JWThenticator
+
+Client->JWThenticator:POST /authenticate\n{"key": "hello_world", "identifier": "5bc5b56-75..."}
+Client<-JWThenticator:200 OK\n{"jwt":"eyJ0eXAi...", "refresh_token":"858c825cf..."}
+
+space
+Client->JWThenticator:POST /validate\n{"jwt":"eyJ0eXAi..."}
+Client<-JWThenticator:200 OK\n{"success": true, "message": null}
+
+space
+Client->JWThenticator:POST /validate\n{"jwt":"eyJ0eXAi..."}
+Client<-JWThenticator:401 UNAUTHORIZED
+
+space
+Client->JWThenticator:POST /refresh\n{"refresh_token":"858c825cf...", "identifier": "5bc5b56-75..."}
+Client<-JWThenticator:200 OK\n{"jwt": "0ODk2LCJ...", "refresh_token": null}
+
+space
+Client->JWThenticator:POST /validate\n{"jwt":"858c825cf..."}
+Client<-JWThenticator:200 OK\n{"success": true, "message": null}

@@ -1,0 +1,35 @@
+title JWThenticator With API Gateway
+
+participant Client
+participant API Gateway
+participant JWThenticator
+participant My Service
+
+== Sync JWKS with JWThenticator ==
+API Gateway-->JWThenticator:GET /jwks
+JWThenticator-->API Gateway:200 OK\n{"n": "2XNR...", "alg": "RS256",... }
+
+space
+== Finished Intialization ==
+
+Client->API Gateway:GET /my_service/protected_endpoint
+activate API Gateway
+note over API Gateway: Vlidate JWT
+Client<-API Gateway:401 UNAUTHORIZED
+deactivate API Gateway
+
+space
+Client->API Gateway:POST /auth/authenticate\n{"key": "hello_world", "identifier": "5bc5b56-75..."}
+activate API Gateway
+note over API Gateway: Unrestricted
+API Gateway->JWThenticator:
+Client<-JWThenticator:200 OK\n{"jwt":"eyJ0eXAi...", "refresh_token":"858c825cf..."}
+deactivate API Gateway
+
+space
+Client->API Gateway:GET /my_service/protected_endpoint\nHeaders - Bearer: eyJ0eXAi...
+activate API Gateway
+note over API Gateway: Vlidate JWT
+API Gateway->My Service:JWT valid!
+Client<-My Service:200 OK\n{"message": "Hello World!"}
+deactivate API Gateway
