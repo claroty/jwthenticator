@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "jwthenticator"
-version = "1.0.0"
+version = "0.0.0"   # For poetry-dynamic-versioning
 description = "A cloud first service for key to JWT authentication library and server written in Python 3."
 authors = ["Guy Zylberberg <guyzyl@gmail.com>", "Claroty Open Source <opensource@claroty.com>"]
 license = "Apache-2.0"
@@ -50,6 +50,10 @@ ignored-classes = [
 ]
 
 
+[tool.poetry-dynamic-versioning]
+enable = true
+
+
 [build-system]
-requires = ["poetry>=0.12"]
+requires = ["poetry>=1.0.2", "poetry-dynamic-versioning"]
 build-backend = "poetry.masonry.api"
