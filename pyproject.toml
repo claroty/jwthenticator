@@ -12,14 +12,14 @@ exclude = ["jwthenticator/tests"]
 
 [tool.poetry.dependencies]
 python = "^3.6"
-sqlalchemy = "^1.3"
-asyncalchemy = "^1.0.0"
-sqlalchemy-utils = "^0.36"
+sqlalchemy = "^1.2.19"
+asyncalchemy = "^1.1.1"
+sqlalchemy-utils = ">=0.33.0, < 1.0.0"
 pg8000 = "1.16.5"   # Constant due to - https://github.com/tlocke/pg8000/issues/53
-aiohttp = "^3.7"
+aiohttp = "^3.6.0"
 pyjwt = "^1.7"
-cryptography = "^3.3"   # Required for pyjwt
-marshmallow = "^3.10"
+cryptography = "^3.1.1"   # Required for pyjwt
+marshmallow = "^3.9"
 marshmallow-dataclass = "^8.3"
 pycryptodomex = "^3.9"
 dataclasses = { version = "^0.7", python = "~3.6" }
