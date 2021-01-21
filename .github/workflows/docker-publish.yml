@@ -76,6 +76,8 @@ jobs:
 
   # Update description on DockerHub
   update_readme:
+    needs: push
+
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
 
