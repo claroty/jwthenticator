@@ -84,6 +84,8 @@ jobs:
     if: github.event_name == 'push' && github.repository_owner	== 'claroty'
 
     steps:
+      - uses: actions/checkout@v2
+
       - name: Update Docker Hub Description
         uses: peter-evans/dockerhub-description@v2
         with:
