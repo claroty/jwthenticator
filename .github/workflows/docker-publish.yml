@@ -41,7 +41,8 @@ jobs:
     needs: test
 
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+    # Verify push (== not PR) and that action is not running on a fork.
+    if: github.event_name == 'push' && github.repository_owner	== 'claroty'
 
     steps:
       - uses: actions/checkout@v2
@@ -79,7 +80,8 @@ jobs:
     needs: push
 
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+    # Verify push (== not PR) and that action is not running on a fork.
+    if: github.event_name == 'push' && github.repository_owner	== 'claroty'
 
     steps:
       - name: Update Docker Hub Description
