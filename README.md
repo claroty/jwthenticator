@@ -24,8 +24,8 @@ Note - if RSA keys are not provided (via the environment variables `RSA_PUBLIC_K
 
 ### Docker
 ```bash
-docker pull claroty/jwthenticator
-docker run -p 8080:8080 claroty/jwthenticator
+docker pull clarotyltd/jwthenticator
+docker run -p 8080:8080 clarotyltd/jwthenticator
 ```
 A database is needed to be linked or configured to the image.\
 See [examples/docker-compose.yml](examples/docker-compose.yml) for a full example, run it using:
