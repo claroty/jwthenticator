@@ -91,5 +91,5 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
-          repository: ${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_NAME
+          repository: clarotyltd/jwthenticator
           readme-filepath: ./README.md
