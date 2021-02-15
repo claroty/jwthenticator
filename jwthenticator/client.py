@@ -11,6 +11,7 @@ from aiohttp import ClientSession, ClientResponse
 
 from jwthenticator import schemas, exceptions
 from jwthenticator.utils import verify_url, fix_url_path
+from jwthenticator.consts import JWT_ALGORITHM
 
 JWT_DECODE_OPTIONS = {"verify_signature": False, "verify_exp": False}
 
@@ -25,7 +26,8 @@ class Client:
 
     # pylint: disable=too-many-arguments
     def __init__(self, jwthenticator_server: str, identifier: UUID, jwt: Optional[str] = None,
-                 refresh_token: Optional[str] = None, key: Optional[str] = None, verify_ssl: Optional[bool] = None) -> None:
+                 refresh_token: Optional[str] = None, key: Optional[str] = None,
+                 verify_ssl: Optional[bool] = None, algorithm: Optional[str] = JWT_ALGORITHM) -> None:
         """
         :param jwthenticator_server: The (full) URL of the jwthenticator server.
             For example - http://localhost:8080/.
@@ -36,10 +38,13 @@ class Client:
         :param key: Key to used to authenticate against jwthenticator server.
         :param verify_ssl: The SSL validation mode given to aiohttp client. Use None for default
             one or False to disable certificate check.
+        :param algorithm: The JWT algorithm used. This is needed for decoding received JWTs
+            and extracting their expiry time. If not given, default will be used.
         """
         self.jwthenticator_server = jwthenticator_server
         self.identifier = identifier
         self.verify_ssl = verify_ssl
+        self.algorithm = algorithm
 
         self._jwt_exp = None
         self.jwt = jwt
@@ -67,7 +72,11 @@ class Client:
     @jwt.setter
     def jwt(self, value: str) -> None:
         self._jwt = value
-        self._jwt_exp = pyjwt.decode(value, options=JWT_DECODE_OPTIONS).get("exp") if value is not None else None
+        if value:
+            # Algorithm is given (even though the client doesn't care) since it's required by pyjwt.
+            self._jwt_exp = pyjwt.decode(value, options=JWT_DECODE_OPTIONS, algorithms=self.algorithm).get("exp")
+        else:
+            self._jwt_exp = None
 
     @property
     def is_jwt_expired(self) -> bool:
