@@ -19,6 +19,7 @@ class TokenManager:
     Class responsible for the creation and loading of tokens
     """
 
+    # pylint: disable=too-many-arguments,too-many-instance-attributes
     def __init__(self, public_key: str, private_key: Optional[str] = None, algorithm: str = JWT_ALGORITHM,
                  jwt_lease_time: int = JWT_LEASE_TIME, jwt_audience: Optional[str] = JWT_AUDIENCE):
         """
