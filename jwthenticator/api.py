@@ -9,7 +9,7 @@ from jwt.utils import force_unicode, to_base64url_uint
 from jwthenticator import schemas
 from jwthenticator.tokens import TokenManager
 from jwthenticator.keys import KeyManager
-from jwthenticator.consts import JWT_ALGORITHM, JWT_ALGORITHM_FAMILY, JWT_LEASE_TIME
+from jwthenticator.consts import JWT_ALGORITHM, JWT_ALGORITHM_FAMILY, JWT_LEASE_TIME, JWT_AUDIENCE
 from jwthenticator.utils import get_rsa_key_pair
 from jwthenticator.exceptions import ExpiredError
 
@@ -23,8 +23,9 @@ class JWThenticatorAPI:
     """
 
     # pylint: disable=too-many-arguments
-    def __init__(self, rsa_key_pair: Tuple[str, Optional[str]] = get_rsa_key_pair(), jwt_lease_time: int = JWT_LEASE_TIME,
-                 jwt_algorithm: str = JWT_ALGORITHM, jwt_algorithm_family: str = JWT_ALGORITHM_FAMILY):
+    def __init__(self, rsa_key_pair: Tuple[str, Optional[str]] = get_rsa_key_pair(),
+                 jwt_lease_time: int = JWT_LEASE_TIME, jwt_algorithm: str = JWT_ALGORITHM,
+                 jwt_algorithm_family: str = JWT_ALGORITHM_FAMILY, jwt_audience: Optional[str] = JWT_AUDIENCE):
         """
         Class can be initiated without giving any parameter, will generate RSA key pair by itself.
         :param rsa_key_pair: (public_key, private_key) RSA key pair. Will generate keys if not given
@@ -33,9 +34,8 @@ class JWThenticatorAPI:
         self.public_key, self._private_key = rsa_key_pair
         self.jwt_algorithm = jwt_algorithm
         self.jwt_algorithm_family = jwt_algorithm_family
-        self.jwt_lease_time = jwt_lease_time
 
-        self.token_manager = TokenManager(self.public_key, self._private_key, self.jwt_algorithm, self.jwt_lease_time)
+        self.token_manager = TokenManager(self.public_key, self._private_key, self.jwt_algorithm, jwt_lease_time, jwt_audience)
         self.key_manager = KeyManager()
 
 
