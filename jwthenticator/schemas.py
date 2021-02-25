@@ -20,6 +20,7 @@ class BaseSchema(Schema):
     SKIP_VALUES = {None}
 
     @post_dump
+    # pylint: disable=unused-argument
     def remove_skip_values(self, data: Any, many: bool):
         return {
             key: value for key, value in data.items()
