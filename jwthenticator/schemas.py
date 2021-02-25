@@ -3,7 +3,7 @@ from __future__ import absolute_import
 
 import uuid
 from dataclasses import field
-from typing import Optional, List, ClassVar, Type, Any
+from typing import Optional, List, ClassVar, Type, Dict, Any
 from datetime import datetime
 
 from marshmallow import Schema, fields, post_dump
@@ -21,7 +21,7 @@ class BaseSchema(Schema):
 
     @post_dump
     # pylint: disable=unused-argument
-    def remove_skip_values(self, data: Any, many: bool):
+    def remove_skip_values(self, data: Any, many: bool) -> Dict[Any, Any]:
         return {
             key: value for key, value in data.items()
             if value not in self.SKIP_VALUES
