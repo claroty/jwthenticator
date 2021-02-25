@@ -16,6 +16,7 @@ JWT_ALGORITHM = environ.get("JWT_ALGORITHM", "RS256")
 JWT_ALGORITHM_FAMILY = environ.get("JWT_ALGORITHM_FAMILY", "RSA")
 JWT_LEASE_TIME = int(environ.get("JWT_LEASE_TIME", 30 * 60)) # In seconds - 30 minutes
 RSA_KEY_STRENGTH = int(environ.get("RSA_KEY_STRENGTH", 2048))
+JWT_AUDIENCE = environ.get("JWT_AUDIENCE", None)
 
 # Token consts
 KEY_EXPIRY = int(environ.get("KEY_EXPIRY", DAYS_TO_SECONDS(120)))  # In seconds

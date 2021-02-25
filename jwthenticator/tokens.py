@@ -11,7 +11,7 @@ from asyncalchemy import create_session_factory
 from jwthenticator.models import Base, RefreshTokenInfo
 from jwthenticator.schemas import JWTPayloadData, RefreshTokenData
 from jwthenticator.exceptions import InvalidTokenError, MissingJWTError
-from jwthenticator.consts import JWT_ALGORITHM, REFRESH_TOKEN_EXPIRY, JWT_LEASE_TIME, DB_URI
+from jwthenticator.consts import JWT_ALGORITHM, REFRESH_TOKEN_EXPIRY, JWT_LEASE_TIME, JWT_AUDIENCE, DB_URI
 
 
 class TokenManager:
@@ -19,7 +19,9 @@ class TokenManager:
     Class responsible for the creation and loading of tokens
     """
 
-    def __init__(self, public_key: str, private_key: Optional[str] = None, algorithm: str = JWT_ALGORITHM, jwt_lease_time: int = JWT_LEASE_TIME):
+    # pylint: disable=too-many-arguments,too-many-instance-attributes
+    def __init__(self, public_key: str, private_key: Optional[str] = None, algorithm: str = JWT_ALGORITHM,
+                 jwt_lease_time: int = JWT_LEASE_TIME, jwt_audience: Optional[str] = JWT_AUDIENCE):
         """
         Accepts public + private key pairs.
         If only public key is given tokens can be loaded but not created.
@@ -32,6 +34,7 @@ class TokenManager:
         self.private_key = private_key
         self.algorithm = algorithm
         self.jwt_lease_time = jwt_lease_time
+        self.jwt_audience = jwt_audience
 
         self.refresh_token_schema = RefreshTokenData.Schema()
         self.jwt_payload_data_schema = JWTPayloadData.Schema()
@@ -52,7 +55,8 @@ class TokenManager:
             token_id=uuid4(),
             identifier=identifier,
             iat=int(now.timestamp()),
-            exp=int((now + timedelta(seconds=self.jwt_lease_time)).timestamp())
+            exp=int((now + timedelta(seconds=self.jwt_lease_time)).timestamp()),
+            aud=self.jwt_audience
         )
         encoded_payload = self.jwt_payload_data_schema.dump(payload)
         token_string = jwt.encode(encoded_payload, self.private_key, self.algorithm)

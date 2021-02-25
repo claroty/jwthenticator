@@ -3,16 +3,29 @@ from __future__ import absolute_import
 
 import uuid
 from dataclasses import field
-from typing import Optional, List, ClassVar, Type
+from typing import Optional, List, ClassVar, Type, Dict, Any
 from datetime import datetime
 
-from marshmallow import Schema, fields
-from marshmallow_dataclass import dataclass, NewType
+from marshmallow import Schema, fields, post_dump
+from marshmallow_dataclass import dataclass, NewType, add_schema
 
 from jwthenticator.consts import JWT_ALGORITHM, JWT_ALGORITHM_FAMILY
 
 # Define the UUID type that uses Marshmallow's UUID + Python's UUID
 UUID = NewType("UUID", uuid.UUID, field=fields.UUID)
+
+
+# Marshmallow base schema for skipping None values on dump
+class BaseSchema(Schema):
+    SKIP_VALUES = {None}
+
+    @post_dump
+    # pylint: disable=unused-argument
+    def remove_skip_values(self, data: Any, many: bool) -> Dict[Any, Any]:
+        return {
+            key: value for key, value in data.items()
+            if value not in self.SKIP_VALUES
+        }
 
 
 # Data dataclasses (that match the sqlalchemy models)
@@ -42,6 +55,8 @@ class RefreshTokenData:
         return self.expires_at > datetime.utcnow()
 
 
+# Skipping None values on dump since aud is optional and can't be None/empty
+@add_schema(base_schema=BaseSchema)
 @dataclass
 class JWTPayloadData:
     Schema: ClassVar[Type[Schema]] = Schema
@@ -49,6 +64,7 @@ class JWTPayloadData:
     identifier: UUID # Machine the JWT was issued to identifier
     iat: int    # Issued at timestamp
     exp: int    # Expires at timestamp
+    aud: Optional[str] = None   # JWT Audience
 
     async def is_valid(self) -> bool:
         return self.exp > datetime.utcnow().timestamp()
