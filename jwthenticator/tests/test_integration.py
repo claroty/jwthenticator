@@ -2,6 +2,7 @@
 from __future__ import absolute_import
 
 import inspect
+from os.path import basename
 from uuid import uuid4
 from http import HTTPStatus
 from typing import Union
@@ -38,8 +39,8 @@ class ContextAwareClient:
 
     async def __call__(self) -> Union[TestClient, ClientSessionType]:
         context = inspect.stack()
-        caller_file = context[1].filename
-        if any([i in caller_file for i in CLIENT_PATCH_FILES]):
+        caller_file = basename(context[1].filename)
+        if caller_file in CLIENT_PATCH_FILES:
             return self.test_client
         return ClientSession()
 
