@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime, timedelta
 from hashlib import sha512
 from uuid import UUID, uuid4
@@ -21,7 +21,7 @@ class TokenManager:
 
     # pylint: disable=too-many-arguments,too-many-instance-attributes
     def __init__(self, public_key: str, private_key: Optional[str] = None, algorithm: str = JWT_ALGORITHM,
-                 jwt_lease_time: int = JWT_LEASE_TIME, jwt_audience: Optional[str] = JWT_AUDIENCE):
+                 jwt_lease_time: int = JWT_LEASE_TIME, jwt_audience: List[str] = JWT_AUDIENCE):
         """
         Accepts public + private key pairs.
         If only public key is given tokens can be loaded but not created.
@@ -34,7 +34,7 @@ class TokenManager:
         self.private_key = private_key
         self.algorithm = algorithm
         self.jwt_lease_time = jwt_lease_time
-        self.jwt_audience = jwt_audience
+        self.jwt_audience = jwt_audience if len(jwt_audience) > 0 else None
 
         self.refresh_token_schema = RefreshTokenData.Schema()
         self.jwt_payload_data_schema = JWTPayloadData.Schema()
