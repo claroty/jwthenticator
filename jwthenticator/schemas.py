@@ -65,7 +65,7 @@ class JWTPayloadData:
     identifier: UUID # Machine the JWT was issued to identifier
     iat: int    # Issued at timestamp
     exp: int    # Expires at timestamp
-    aud: Optional[str] = None   # JWT Audience
+    aud: Optional[List[str]] = None   # JWT Audience
 
     async def is_valid(self) -> bool:
         return self.exp > datetime.utcnow().timestamp()
