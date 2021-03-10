@@ -23,6 +23,7 @@ marshmallow = "^3.9"
 marshmallow-dataclass = "^8.3"
 pycryptodomex = "^3.9"
 dataclasses = { version = "^0.7", python = "~3.6" }
+environs = "^9.3.1"
 
 
 [tool.poetry.dev-dependencies]
