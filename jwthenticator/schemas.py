@@ -56,13 +56,13 @@ class RefreshTokenData:
         return self.expires_at > datetime.utcnow()
 
 
-# Skipping None values on dump since aud is optional and can't be None/empty
+# Skipping None values on dump since 'aud' is optional and can't be None/empty
 @add_schema(base_schema=BaseSchema)
 @dataclass
 class JWTPayloadData:
     Schema: ClassVar[Type[Schema]] = Schema
     token_id: UUID   # JWT token identifier
-    identifier: UUID # Machine the JWT was issued to identifier
+    identifier: UUID # Identifier of who the JWT was issued to
     iat: int    # Issued at timestamp
     exp: int    # Expires at timestamp
     aud: Optional[List[str]] = None   # JWT Audience
@@ -80,7 +80,7 @@ class KeyRequest:
 
 @dataclass
 class RegisterKeyRequest(KeyRequest):
-    identifier: UUID # Machine the JWT was issued to identifier
+    identifier: UUID # Identifier of who the JWT was issued to
 
 
 @dataclass
