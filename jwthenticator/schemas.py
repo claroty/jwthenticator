@@ -5,6 +5,7 @@ import uuid
 from dataclasses import field
 from typing import Optional, List, ClassVar, Type, Dict, Any
 from datetime import datetime
+from collections.abc import Hashable
 
 from marshmallow import Schema, fields, post_dump
 from marshmallow_dataclass import dataclass, NewType, add_schema
@@ -24,7 +25,7 @@ class BaseSchema(Schema):
     def remove_skip_values(self, data: Any, many: bool) -> Dict[Any, Any]:
         return {
             key: value for key, value in data.items()
-            if value not in self.SKIP_VALUES
+            if not isinstance(value, Hashable) or value not in self.SKIP_VALUES
         }
 
 
@@ -64,7 +65,7 @@ class JWTPayloadData:
     identifier: UUID # Machine the JWT was issued to identifier
     iat: int    # Issued at timestamp
     exp: int    # Expires at timestamp
-    aud: Optional[str] = None   # JWT Audience
+    aud: Optional[List[str]] = None   # JWT Audience
 
     async def is_valid(self) -> bool:
         return self.exp > datetime.utcnow().timestamp()

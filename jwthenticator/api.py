@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List
 from hashlib import sha512
 
 from Cryptodome.PublicKey import RSA
@@ -25,7 +25,7 @@ class JWThenticatorAPI:
     # pylint: disable=too-many-arguments
     def __init__(self, rsa_key_pair: Tuple[str, Optional[str]] = get_rsa_key_pair(),
                  jwt_lease_time: int = JWT_LEASE_TIME, jwt_algorithm: str = JWT_ALGORITHM,
-                 jwt_algorithm_family: str = JWT_ALGORITHM_FAMILY, jwt_audience: Optional[str] = JWT_AUDIENCE):
+                 jwt_algorithm_family: str = JWT_ALGORITHM_FAMILY, jwt_audience: List[str] = JWT_AUDIENCE):
         """
         Class can be initiated without giving any parameter, will generate RSA key pair by itself.
         :param rsa_key_pair: (public_key, private_key) RSA key pair. Will generate keys if not given
