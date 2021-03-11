@@ -29,7 +29,7 @@ class JWThenticatorAPI:
         """
         Class can be initiated without giving any parameter, will generate RSA key pair by itself.
         :param rsa_key_pair: (public_key, private_key) RSA key pair. Will generate keys if not given
-            keys or paths through consts. In canse private_key is None will only support token validation.
+            keys or paths through consts. In case private_key is None will only support token validation.
         """
         self.public_key, self._private_key = rsa_key_pair
         self.jwt_algorithm = jwt_algorithm
