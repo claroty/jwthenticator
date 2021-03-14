@@ -1,7 +1,8 @@
 from __future__ import absolute_import
 
-from typing import Optional, Tuple, List
+from base64 import b64encode
 from hashlib import sha512
+from typing import Optional, Tuple, List
 
 from Cryptodome.PublicKey import RSA
 from jwt.utils import force_unicode, to_base64url_uint
@@ -105,14 +106,18 @@ class JWThenticatorAPI:
         See here for more details: https://auth0.com/docs/tokens/references/jwks-properties
         """
         rsa_obj = RSA.import_key(self.public_key)
+        rsa_der = rsa_obj.export_key("DER")
 
-        jwks_obj = schemas.JWKSResponse(
+        jwk_payload = schemas.JWKPayload(
             alg=self.jwt_algorithm,
             kty=self.jwt_algorithm_family,
             use="sig",
-            x5c=[self.public_key],
+            x5c=[b64encode(rsa_der).decode("utf8")],
             n=INT_TO_BIG_ENDIAN(rsa_obj.n),
-            e=INT_TO_BIG_ENDIAN(rsa_obj.e)
+            e=INT_TO_BIG_ENDIAN(rsa_obj.e),
+            kid=self.key_signature,
+            x5t=self.key_signature
         )
 
+        jwks_obj = schemas.JWKSResponse([jwk_payload])
         return jwks_obj
