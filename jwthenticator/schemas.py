@@ -119,7 +119,7 @@ class BoolResponse:
 
 
 @dataclass
-class JWKSResponse:
+class JWKPayload:
     """
     See https://auth0.com/docs/tokens/json-web-tokens/json-web-key-set-properties
     """
