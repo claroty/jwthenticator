@@ -132,3 +132,9 @@ class JWKPayload:
     alg: str = JWT_ALGORITHM    # Key algorithm
     kty: str = JWT_ALGORITHM_FAMILY # Key algorithm family
     use: str = "sig"    # How key will be used, sig (signature) by default
+
+
+@dataclass
+class JWKSResponse:
+    Schema: ClassVar[Type[Schema]] = Schema
+    keys: List[JWKPayload]
