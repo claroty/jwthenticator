@@ -21,7 +21,7 @@ class TokenManager:
 
     # pylint: disable=too-many-arguments,too-many-instance-attributes
     def __init__(self, public_key: str, private_key: Optional[str] = None, algorithm: str = JWT_ALGORITHM,
-                 jwt_lease_time: int = JWT_LEASE_TIME, jwt_audience: List[str] = JWT_AUDIENCE):
+                 jwt_lease_time: int = JWT_LEASE_TIME, jwt_audience: List[str] = JWT_AUDIENCE, key_id: Optional[str] = None):
         """
         Accepts public + private key pairs.
         If only public key is given tokens can be loaded but not created.
@@ -35,6 +35,7 @@ class TokenManager:
         self.algorithm = algorithm
         self.jwt_lease_time = jwt_lease_time
         self.jwt_audience = jwt_audience if len(jwt_audience) > 0 else None
+        self.jwt_headers = {"kid": key_id} if key_id else None
 
         self.refresh_token_schema = RefreshTokenData.Schema()
         self.jwt_payload_data_schema = JWTPayloadData.Schema()
@@ -59,7 +60,7 @@ class TokenManager:
             aud=self.jwt_audience
         )
         encoded_payload = self.jwt_payload_data_schema.dump(payload)
-        token_string = jwt.encode(encoded_payload, self.private_key, self.algorithm)
+        token_string = jwt.encode(encoded_payload, self.private_key, self.algorithm, headers=self.jwt_headers)
         return token_string.decode()
 
 
