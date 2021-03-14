@@ -119,14 +119,22 @@ class BoolResponse:
 
 
 @dataclass
-class JWKSResponse:
+class JWKPayload:   # pylint: disable=too-many-instance-attributes
     """
-    See https://auth0.com/docs/tokens/references/jwks-properties
+    See https://auth0.com/docs/tokens/json-web-tokens/json-web-key-set-properties
     """
     Schema: ClassVar[Type[Schema]] = Schema
-    x5c: List[str]
-    n: bytes
-    e: bytes
-    alg: str = JWT_ALGORITHM
-    kty: str = JWT_ALGORITHM_FAMILY
-    use: str = "sig"
+    x5c: List[str]  # x.509 certificate chain
+    n: bytes    # RSA public key modulus
+    e: bytes    # RSA public key exponent
+    x5t: str    # x.509 SHA-1 thumbprint
+    kid: str    # Unique key identifier
+    alg: str = JWT_ALGORITHM    # Key algorithm
+    kty: str = JWT_ALGORITHM_FAMILY # Key algorithm family
+    use: str = "sig"    # How key will be used, sig (signature) by default
+
+
+@dataclass
+class JWKSResponse:
+    Schema: ClassVar[Type[Schema]] = Schema
+    keys: List[JWKPayload]
