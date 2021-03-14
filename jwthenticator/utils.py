@@ -3,7 +3,9 @@ from __future__ import absolute_import
 from typing import Tuple, Optional
 from urllib.parse import urlparse
 
+from jwt.utils import base64url_encode
 from Cryptodome.PublicKey import RSA
+from Cryptodome.Hash import SHA1
 
 from jwthenticator.consts import RSA_KEY_STRENGTH, RSA_PUBLIC_KEY, RSA_PRIVATE_KEY, RSA_PUBLIC_KEY_PATH, RSA_PRIVATE_KEY_PATH
 
@@ -47,6 +49,23 @@ def create_rsa_key_pair() -> Tuple[str, str]:
     public_key = key.publickey().export_key().decode()
     private_key = key.export_key().decode()
     return public_key, private_key
+
+
+def calculate_key_signature(public_key: str) -> str:
+    """
+    Calculate the SHA1 signature for a given RSA public key.
+    Calculation follows the JWK RFC7517 section 4.8 meaning base64
+        URL encoding of SHA1 signature of public RSA key.
+    :param public_key: The public key to calculate signature for.
+    """
+    rsa_obj = RSA.import_key(public_key)
+    rsa_der = rsa_obj.export_key("DER")
+
+    hasher = SHA1.new()
+    hasher.update(rsa_der)
+    fingerprint = base64url_encode(hasher.digest())
+
+    return fingerprint.decode("utf8")
 
 
 def verify_url(url: str) -> bool:
