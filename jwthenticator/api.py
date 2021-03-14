@@ -10,7 +10,7 @@ from jwthenticator import schemas
 from jwthenticator.tokens import TokenManager
 from jwthenticator.keys import KeyManager
 from jwthenticator.consts import JWT_ALGORITHM, JWT_ALGORITHM_FAMILY, JWT_LEASE_TIME, JWT_AUDIENCE
-from jwthenticator.utils import get_rsa_key_pair
+from jwthenticator.utils import get_rsa_key_pair, calculate_key_signature
 from jwthenticator.exceptions import ExpiredError
 
 INT_TO_BIG_ENDIAN = lambda x: force_unicode(to_base64url_uint(x))
@@ -34,8 +34,9 @@ class JWThenticatorAPI:
         self.public_key, self._private_key = rsa_key_pair
         self.jwt_algorithm = jwt_algorithm
         self.jwt_algorithm_family = jwt_algorithm_family
+        self.key_signature = calculate_key_signature(self.public_key)
 
-        self.token_manager = TokenManager(self.public_key, self._private_key, self.jwt_algorithm, jwt_lease_time, jwt_audience)
+        self.token_manager = TokenManager(self.public_key, self._private_key, self.jwt_algorithm, jwt_lease_time, jwt_audience, key_id=self.key_signature)
         self.key_manager = KeyManager()
 
 
