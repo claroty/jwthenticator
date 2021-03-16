@@ -73,7 +73,7 @@ class TokenManager:
         """
         if not token_string:
             raise MissingJWTError
-        token_dict: dict = jwt.decode(token_string, self.public_key, algorithms=self.algorithm, options={"verify_exp": False})
+        token_dict: dict = jwt.decode(token_string, self.public_key, algorithms=[self.algorithm], options={"verify_exp": False})
         token_data = self.jwt_payload_data_schema.load(token_dict)
         return token_data
 
