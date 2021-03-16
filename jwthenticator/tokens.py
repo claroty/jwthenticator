@@ -61,7 +61,7 @@ class TokenManager:
         )
         encoded_payload = self.jwt_payload_data_schema.dump(payload)
         token_string = jwt.encode(encoded_payload, self.private_key, self.algorithm, headers=self.jwt_headers)
-        return token_string.decode()
+        return token_string
 
 
     async def load_access_token(self, token_string: str) -> JWTPayloadData:
@@ -73,7 +73,7 @@ class TokenManager:
         """
         if not token_string:
             raise MissingJWTError
-        token_dict: dict = jwt.decode(token_string, self.public_key, algorithms=self.algorithm, options={"verify_exp": False})
+        token_dict: dict = jwt.decode(token_string, self.public_key, algorithms=[self.algorithm], options={"verify_exp": False})
         token_data = self.jwt_payload_data_schema.load(token_dict)
         return token_data
 

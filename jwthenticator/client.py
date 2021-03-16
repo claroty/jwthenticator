@@ -27,7 +27,7 @@ class Client:
     # pylint: disable=too-many-arguments
     def __init__(self, jwthenticator_server: str, identifier: UUID, jwt: Optional[str] = None,
                  refresh_token: Optional[str] = None, key: Optional[str] = None,
-                 verify_ssl: Optional[bool] = None, algorithm: Optional[str] = JWT_ALGORITHM) -> None:
+                 verify_ssl: Optional[bool] = None, algorithm: str = JWT_ALGORITHM) -> None:
         """
         :param jwthenticator_server: The (full) URL of the jwthenticator server.
             For example - http://localhost:8080/.
@@ -74,7 +74,7 @@ class Client:
         self._jwt = value
         if value:
             # Algorithm is given (even though the client doesn't care) since it's required by pyjwt.
-            self._jwt_exp = pyjwt.decode(value, options=JWT_DECODE_OPTIONS, algorithms=self.algorithm).get("exp")
+            self._jwt_exp = pyjwt.decode(value, options=JWT_DECODE_OPTIONS, algorithms=[self.algorithm]).get("exp")
         else:
             self._jwt_exp = None
 

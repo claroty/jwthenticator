@@ -5,7 +5,7 @@ from hashlib import sha512
 from typing import Optional, Tuple, List
 
 from Cryptodome.PublicKey import RSA
-from jwt.utils import force_unicode, to_base64url_uint
+from jwt.utils import to_base64url_uint
 
 from jwthenticator import schemas
 from jwthenticator.tokens import TokenManager
@@ -13,9 +13,6 @@ from jwthenticator.keys import KeyManager
 from jwthenticator.consts import JWT_ALGORITHM, JWT_ALGORITHM_FAMILY, JWT_LEASE_TIME, JWT_AUDIENCE
 from jwthenticator.utils import get_rsa_key_pair, calculate_key_signature
 from jwthenticator.exceptions import ExpiredError
-
-INT_TO_BIG_ENDIAN = lambda x: force_unicode(to_base64url_uint(x))
-
 
 class JWThenticatorAPI:
     """
@@ -113,8 +110,8 @@ class JWThenticatorAPI:
             kty=self.jwt_algorithm_family,
             use="sig",
             x5c=[b64encode(rsa_der).decode("utf8")],
-            n=INT_TO_BIG_ENDIAN(rsa_obj.n),
-            e=INT_TO_BIG_ENDIAN(rsa_obj.e),
+            n=to_base64url_uint(rsa_obj.n),
+            e=to_base64url_uint(rsa_obj.e),
             kid=self.key_signature,
             x5t=self.key_signature
         )
