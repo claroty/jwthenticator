@@ -24,7 +24,8 @@ class TestAPI:
         await self.api.register_key(RegisterKeyRequest(key=key, identifier=uuid_identifier))
 
         # Check that the key was registered
-        await self.api.is_key_registerd(KeyRequest(key=key))
+        is_key_registered = await self.api.is_key_registerd(KeyRequest(key=key))
+        assert is_key_registered.result
 
         # Authenticate and get access + refres tokens
         tokens_obj_a = await self.api.authenticate(AuthRequest(key=key, identifier=uuid_identifier))
