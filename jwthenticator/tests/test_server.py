@@ -3,9 +3,11 @@ from __future__ import absolute_import
 
 from uuid import uuid4
 from http import HTTPStatus
+from unittest.mock import MagicMock
 
 from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
 from aiohttp.web import Application
+from jwt import PyJWKClient
 
 from freezegun import freeze_time
 
@@ -91,13 +93,18 @@ class TestServer(AioHTTPTestCase):
         response_json = await response.json()
 
         # Check that new access token is also valid
-        request = self.jwt_validate_request_schema.dump(JWTValidateRequest(jwt=response_json["jwt"]))
+        token = response_json["jwt"]
+        request = self.jwt_validate_request_schema.dump(JWTValidateRequest(jwt=token))
         response = await self.client.post("/validate", json=request)
         assert response.status == HTTPStatus.OK
 
         # Test JWKS
         response = await self.client.get("/jwks")
         assert response.status == HTTPStatus.OK
+        response_json = await response.json()
+        jwks_client = PyJWKClient("")
+        jwks_client.fetch_data = MagicMock(return_value=response_json)  # type: ignore
+        assert jwks_client.get_signing_key_from_jwt(token)
 
 
     @unittest_run_loop
