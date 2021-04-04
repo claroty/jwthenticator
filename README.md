@@ -118,7 +118,7 @@ The JWTs are short lived (as they should be) with a configurable lease time via 
 Additionaly, similarly to the keys we use a UUID identifier in the authentication process and store it in the JWT's payload. This is useful for better client identification or smarter k8s routing.
 
 
-## Addtional Features
+## Additional Features
 - All consts can be overriden via environment variables, see [jwthenticator/consts.py](jwthenticator/consts.py) for the full list.
 - Service contains both internal and public routes, the admin / public API's can be disabled by setting the `DISABLE_EXTERNAL_API` or `DISABLE_INTERNAL_API` env vars. This is very important when running the service in production environments, you don't want to expose the key registration to the general public :).
 - The service can be used with any JWT verification service or API gateway using the industry standard JWKS ([RFC 7517](https://tools.ietf.org/html/rfc7517)) via `/jwks` API call.
