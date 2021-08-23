@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from os.path import isfile
 from typing import Tuple, Optional
 from urllib.parse import urlparse
 
@@ -14,29 +15,42 @@ def get_rsa_key_pair() -> Tuple[str, Optional[str]]:
     """
     Get RSA key pair.
     Will try to get them by this order:
-    1. RSA_PUBLIC/PRIVATE_KEY_PATH
-    2. RSA_PUBLIC/PRIVATE_KEY
-    3. Generate new keys.
+    1. Read from RSA_PUBLIC/PRIVATE_KEY_PATH
+    2. If RSA_PUBLIC/PRIVATE_KEY_PATH exists but no file exists - create keys and write to path
+    3. Use RSA_PUBLIC/PRIVATE_KEY
+    4. Generate new keys.
     :return (public_key, private_key): A key pair tuple.
         Will raise exception if key paths are given and fail to read.
     """
-    if RSA_PUBLIC_KEY_PATH is not None:
-        # Read public key.
-        with open(RSA_PUBLIC_KEY_PATH) as f_obj:
-            public_key = f_obj.read()
+    if RSA_PUBLIC_KEY_PATH and isfile(RSA_PUBLIC_KEY_PATH):
+        return _read_rsa_keys_from_file()
 
-        # Read private key if given.
-        private_key = None
-        if RSA_PRIVATE_KEY_PATH is not None:
-            with open(RSA_PRIVATE_KEY_PATH) as f_obj:
-                private_key = f_obj.read()
+    if RSA_PUBLIC_KEY_PATH:
+        return _create_rsa_key_files()
 
-        return (public_key, private_key)
-
-    if RSA_PUBLIC_KEY is not None:
-        return (RSA_PUBLIC_KEY, RSA_PRIVATE_KEY)
+    if RSA_PUBLIC_KEY:
+        return RSA_PUBLIC_KEY, RSA_PRIVATE_KEY
 
     return create_rsa_key_pair()
+
+
+def _read_rsa_keys_from_file() -> Tuple[str, Optional[str]]:
+    with open(RSA_PUBLIC_KEY_PATH, 'r', encoding='utf8') as f_obj:
+        public_key = f_obj.read()
+    private_key = None
+    if RSA_PRIVATE_KEY_PATH is not None:
+        with open(RSA_PRIVATE_KEY_PATH, 'r', encoding='utf8') as f_obj:
+            private_key = f_obj.read()
+    return public_key, private_key
+
+
+def _create_rsa_key_files() -> Tuple[str, Optional[str]]:
+    public_key, private_key = create_rsa_key_pair()
+    with open(RSA_PUBLIC_KEY_PATH, 'w', encoding='utf8') as f_obj:
+        f_obj.write(public_key)
+    with open(RSA_PRIVATE_KEY_PATH, 'w', encoding='utf8') as f_obj:
+        f_obj.write(private_key)
+    return public_key, private_key
 
 
 def create_rsa_key_pair() -> Tuple[str, str]:
