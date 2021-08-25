@@ -1,8 +1,11 @@
+from datetime import datetime
 import os
 from importlib import reload
 from os import environ
-from typing import Tuple, Optional
+from typing import Tuple, Optional, AsyncGenerator
 import pytest
+from async_generator import asynccontextmanager
+from Cryptodome.PublicKey import RSA
 
 import jwthenticator.utils
 from jwthenticator import consts
@@ -21,12 +24,16 @@ def _reload_env_vars_get_rsa_key_pair() -> Tuple[str, Optional[str]]:
     return get_rsa_key_pair()
 
 
-async def _create_random_file() -> Tuple[str, str]:
+@asynccontextmanager
+async def _create_random_file() -> AsyncGenerator[Tuple[str, str], None]:
     random_data = await random_key(8)
-    filename = f"test_tmp_file_{await random_key(5)}.txt"
+    filename = f"test_tmp_file_{datetime.now()}.txt"
     with open(filename, "w", encoding='utf8') as file:
         file.write(random_data)
-    return filename, random_data
+    try:
+        yield filename, random_data
+    finally:
+        os.remove(filename)
 
 
 @backup_environment
@@ -53,44 +60,46 @@ async def test_get_rsa_key_pair_no_input() -> None:
     environ[PUBLIC_KEY_VALUE_ENV_KEY] = ""
     environ[PRIVATE_KEY_VALUE_ENV_KEY] = ""
     public_key, private_key = _reload_env_vars_get_rsa_key_pair()
-    assert public_key.count("PUBLIC KEY-----") == 2
+    assert RSA.import_key(str(private_key))
+    assert RSA.import_key(str(public_key))
 
-    # Type can be ignored because a private key should be generated
-    assert private_key.count("PRIVATE KEY-----") == 2  # type: ignore
 
 @backup_environment
 @pytest.mark.asyncio
 # File exists - read keys
 async def test_get_rsa_key_pair_from_file() -> None:
-    private_file_name, private_file_data = await _create_random_file()
-    public_file_name, public_file_data = await _create_random_file()
-    environ[PUBLIC_KEY_PATH_ENV_KEY] = public_file_name
-    environ[PRIVATE_KEY_PATH_ENV_KEY] = private_file_name
-    public_key, private_key = _reload_env_vars_get_rsa_key_pair()
-    assert public_file_data in public_key
+    # Pylint sets a false positive
+    async with _create_random_file() as (private_file_name, private_file_data), \
+            _create_random_file() as (public_file_name, public_file_data):  # pylint: disable=not-async-context-manager
+        environ[PUBLIC_KEY_PATH_ENV_KEY] = public_file_name
+        environ[PRIVATE_KEY_PATH_ENV_KEY] = private_file_name
+        public_key, private_key = _reload_env_vars_get_rsa_key_pair()
+        assert public_file_data in public_key
 
-    # Type can be ignored because a private key should be generated
-    assert private_file_data in private_key  # type: ignore
-    os.remove(private_file_name)
-    os.remove(public_file_name)
+        # Type can be ignored because a private key should be generated
+        assert private_file_data in private_key  # type: ignore
 
 
 @backup_environment
 @pytest.mark.asyncio
 # Path exists and files do not exist - create them
 async def test_get_rsa_key_pair_create_file() -> None:
-    public_file_name = f"test_tmp_file_{await random_key(5)}.txt"
-    private_file_name = f"test_tmp_file_{await random_key(5)}.txt"
+    public_file_name = f"test_tmp_file_{datetime.now()}.txt"
+    private_file_name = f"test_tmp_file_{datetime.now()}.txt"
     environ[PUBLIC_KEY_PATH_ENV_KEY] = public_file_name
     environ[PRIVATE_KEY_PATH_ENV_KEY] = private_file_name
-    public_key, private_key = _reload_env_vars_get_rsa_key_pair()
-    with open(public_file_name, 'r', encoding='utf8') as file:
-        public_key_from_file = file.read()
-    with open(private_file_name, 'r', encoding='utf8') as file:
-        private_key_from_file = file.read()
-    assert public_key_from_file == public_key
-    assert private_key_from_file == private_key
-    assert public_key_from_file.count("PUBLIC KEY-----") == 2
-    assert private_key_from_file.count("PRIVATE KEY-----") == 2
-    os.remove(public_file_name)
-    os.remove(private_file_name)
+    try:
+        public_key, private_key = _reload_env_vars_get_rsa_key_pair()
+        with open(public_file_name, 'r', encoding='utf8') as file:
+            public_key_from_file = file.read()
+        with open(private_file_name, 'r', encoding='utf8') as file:
+            private_key_from_file = file.read()
+        assert public_key_from_file == public_key
+        assert private_key_from_file == private_key
+        assert RSA.import_key(public_key_from_file)
+        assert RSA.import_key(private_key_from_file)
+    finally:
+        try:
+            os.remove(public_file_name)
+        finally:
+            os.remove(private_file_name)

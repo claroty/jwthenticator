@@ -14,18 +14,18 @@ from jwthenticator.consts import RSA_KEY_STRENGTH, RSA_PUBLIC_KEY, RSA_PRIVATE_K
 def get_rsa_key_pair() -> Tuple[str, Optional[str]]:
     """
     Get RSA key pair.
-    Will try to get them by this order:
-    1. Read from RSA_PUBLIC/PRIVATE_KEY_PATH
-    2. If RSA_PUBLIC/PRIVATE_KEY_PATH exists but no file exists - create keys and write to path
-    3. Use RSA_PUBLIC/PRIVATE_KEY
-    4. Generate new keys.
+    Will get RSA key pair depending on available ENV variables, in the following order:
+    1. Read file path from RSA_PUBLIC_PATH and PRIVATE_KEY_PATH and use the files there,
+       If a path is specified (in RSA_PUBLIC_PATH and PRIVATE_KEY_PATH) but the files do
+       not exist - they will be created and populated
+    2. Use data directly in the env vars RSA_PUBLIC_KEY and RSA_PRIVATE_KEY
+    3. Use stateless new keys
     :return (public_key, private_key): A key pair tuple.
         Will raise exception if key paths are given and fail to read.
     """
-    if RSA_PUBLIC_KEY_PATH and isfile(RSA_PUBLIC_KEY_PATH):
-        return _read_rsa_keys_from_file()
-
     if RSA_PUBLIC_KEY_PATH:
+        if isfile(RSA_PUBLIC_KEY_PATH):
+            return _read_rsa_keys_from_file()
         return _create_rsa_key_files()
 
     if RSA_PUBLIC_KEY:
