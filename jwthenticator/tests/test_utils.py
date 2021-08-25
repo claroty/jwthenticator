@@ -4,6 +4,8 @@ from importlib import reload
 from os import environ
 from typing import Tuple, Optional, AsyncGenerator
 import pytest
+
+import aiofiles
 from async_generator import asynccontextmanager
 from Cryptodome.PublicKey import RSA
 
@@ -28,8 +30,9 @@ def _reload_env_vars_get_rsa_key_pair() -> Tuple[str, Optional[str]]:
 async def _create_random_file() -> AsyncGenerator[Tuple[str, str], None]:
     random_data = await random_key(8)
     filename = f"test_tmp_file_{datetime.now()}.txt"
-    with open(filename, "w", encoding='utf8') as file:
-        file.write(random_data)
+    # ignore type due to mypy-aiofiles issues
+    async with aiofiles.open(filename, "w", encoding='utf8') as file:  # type: ignore
+        await file.write(random_data)
     try:
         yield filename, random_data
     finally:
@@ -90,10 +93,11 @@ async def test_get_rsa_key_pair_create_file() -> None:
     environ[PRIVATE_KEY_PATH_ENV_KEY] = private_file_name
     try:
         public_key, private_key = _reload_env_vars_get_rsa_key_pair()
-        with open(public_file_name, 'r', encoding='utf8') as file:
-            public_key_from_file = file.read()
-        with open(private_file_name, 'r', encoding='utf8') as file:
-            private_key_from_file = file.read()
+        # ignore type due to mypy-aiofiles issues
+        async with aiofiles.open(public_file_name, 'r', encoding='utf8') as file:  # type: ignore
+            public_key_from_file = await file.read()
+        async with aiofiles.open(private_file_name, 'r', encoding='utf8') as file:  # type: ignore
+            private_key_from_file = await file.read()
         assert public_key_from_file == public_key
         assert private_key_from_file == private_key
         assert RSA.import_key(public_key_from_file)
