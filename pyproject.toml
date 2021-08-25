@@ -35,6 +35,9 @@ pytest-aiohttp = "^0.3"
 freezegun = "^1.0"
 pyjwt = "^2.0"
 diagrams = "^0.17.0"
+mock = "^4.0.3"
+async_generator = "^1.10"
+aiofiles = "^0.7.0"
 
 
 [tool.pylint.message_control]
