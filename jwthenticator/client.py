@@ -82,7 +82,7 @@ class Client:
     def is_jwt_expired(self) -> bool:
         if self._jwt_exp is None:
             return True
-        return datetime.utcnow().timestamp() >= self._jwt_exp
+        return datetime.now().timestamp() >= self._jwt_exp
 
     @property
     def refresh_token(self) -> Optional[str]:

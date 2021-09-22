@@ -31,7 +31,7 @@ class KeyManager:
         :return: Returns True if successfull, raises exception otherwise.
         """
         if expires_at is None:
-            expires_at = datetime.utcnow() + timedelta(seconds=KEY_EXPIRY)
+            expires_at = datetime.now() + timedelta(seconds=KEY_EXPIRY)
         key_hash = sha512(key.encode()).hexdigest()
 
         # If key already exists, update expiry date.

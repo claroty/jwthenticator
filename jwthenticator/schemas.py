@@ -40,7 +40,7 @@ class KeyData:
     key: Optional[str] = field(default=None, repr=False, metadata=dict(load_only=True))
 
     async def is_valid(self) -> bool:
-        return self.expires_at > datetime.utcnow()
+        return self.expires_at > datetime.now()
 
 
 @dataclass
@@ -53,7 +53,7 @@ class RefreshTokenData:
     key_id: int
 
     async def is_valid(self) -> bool:
-        return self.expires_at > datetime.utcnow()
+        return self.expires_at > datetime.now()
 
 
 # Skipping None values on dump since 'aud' is optional and can't be None/empty
@@ -68,7 +68,7 @@ class JWTPayloadData:
     aud: Optional[List[str]] = None   # JWT Audience
 
     async def is_valid(self) -> bool:
-        return self.exp > datetime.utcnow().timestamp()
+        return self.exp > datetime.now().timestamp()
 
 
 # Request dataclasses

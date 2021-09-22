@@ -51,7 +51,7 @@ class TokenManager:
         """
         if self.private_key is None:
             raise Exception("Private key required for JWT token creation")
-        now = datetime.utcnow()
+        now = datetime.now()
         payload = JWTPayloadData(
             token_id=uuid4(),
             identifier=identifier,
@@ -68,8 +68,6 @@ class TokenManager:
         """
         Load + parse an existing JWT token.
         Raises exception if the token is incorrectly signed.
-        Exp verification is disabled since it checks againt datetime.now(), and we want to
-            ignore the machine's timezone by using `datetime.utcnow()` everywhere.
         """
         if not token_string:
             raise MissingJWTError
@@ -85,8 +83,8 @@ class TokenManager:
         :return: The refresh token created.
         """
         if expires_at is None:
-            expires_at = expires_at = datetime.utcnow() + timedelta(seconds=REFRESH_TOKEN_EXPIRY)
-        if expires_at <= datetime.utcnow():
+            expires_at = expires_at = datetime.now() + timedelta(seconds=REFRESH_TOKEN_EXPIRY)
+        if expires_at <= datetime.now():
             raise Exception("Refresh token can't be created in the past")
 
         refresh_token_str = sha512(uuid4().bytes).hexdigest()
