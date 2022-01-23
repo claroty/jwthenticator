@@ -53,6 +53,7 @@ class KeyManager:
         Check if a key exists in DB.
         """
         async with self.session_factory() as session:
+            await session.commit()
             if await session.query(KeyInfo).filter_by(key_hash=key_hash).count() == 1:
                 return True
         return False

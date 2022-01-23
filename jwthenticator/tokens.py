@@ -89,13 +89,14 @@ class TokenManager:
 
         refresh_token_str = sha512(uuid4().bytes).hexdigest()
         async with self.session_factory() as session:
+            await session.commit()
             refresh_token_info_obj = RefreshTokenInfo(
                 expires_at=expires_at,
                 token=refresh_token_str,
                 key_id=key_id
             )
             await session.add(refresh_token_info_obj)
-            await session.flush()
+            await session.commit()
         return refresh_token_str
 
 
