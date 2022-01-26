@@ -13,6 +13,8 @@ from jwthenticator.keys import KeyManager
 from jwthenticator.consts import JWT_ALGORITHM, JWT_ALGORITHM_FAMILY, JWT_LEASE_TIME, JWT_AUDIENCE
 from jwthenticator.utils import get_rsa_key_pair, calculate_key_signature
 from jwthenticator.exceptions import ExpiredError
+from jwthenticator.loop_management import is_using_sqlite, db_lock
+
 
 class JWThenticatorAPI:
     """
@@ -49,7 +51,13 @@ class JWThenticatorAPI:
             raise ExpiredError("Key is expired.")
 
         jwt_token = await self.token_manager.create_access_token(request.identifier)
-        refresh_token = await self.token_manager.create_refresh_token(key_obj.id)
+
+        if is_using_sqlite():
+            # this lock is designed to block multiple request to sqlite causing DB lock
+            async with db_lock:
+                refresh_token = await self.token_manager.create_refresh_token(key_obj.id)
+        else:
+            refresh_token = await self.token_manager.create_refresh_token(key_obj.id)
 
         return schemas.TokenResponse(
             jwt=jwt_token,

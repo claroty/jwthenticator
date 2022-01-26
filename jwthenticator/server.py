@@ -16,7 +16,7 @@ from jwthenticator.api import JWThenticatorAPI
 from jwthenticator.utils import get_rsa_key_pair
 from jwthenticator.server_utils import extract_jwt
 from jwthenticator.consts import PORT, URL_PREFIX, DISABLE_EXTERNAL_API, DISABLE_INTERNAL_API
-from loop_management import loop
+from jwthenticator.loop_management import loop
 
 
 class Server:
