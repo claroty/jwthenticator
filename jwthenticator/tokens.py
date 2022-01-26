@@ -12,7 +12,7 @@ from jwthenticator.models import Base, RefreshTokenInfo
 from jwthenticator.schemas import JWTPayloadData, RefreshTokenData
 from jwthenticator.exceptions import InvalidTokenError, MissingJWTError
 from jwthenticator.consts import JWT_ALGORITHM, REFRESH_TOKEN_EXPIRY, JWT_LEASE_TIME, JWT_AUDIENCE, DB_URI
-
+from loop_management import db_lock
 
 class TokenManager:
     """
@@ -88,15 +88,16 @@ class TokenManager:
             raise Exception("Refresh token can't be created in the past")
 
         refresh_token_str = sha512(uuid4().bytes).hexdigest()
-        async with self.session_factory() as session:
-            refresh_token_info_obj = RefreshTokenInfo(
-                expires_at=expires_at,
-                token=refresh_token_str,
-                key_id=key_id
-            )
-            await session.add(refresh_token_info_obj)
-            await session.flush()
-        return refresh_token_str
+        async with db_lock:
+            async with self.session_factory() as session:
+                refresh_token_info_obj = RefreshTokenInfo(
+                    expires_at=expires_at,
+                    token=refresh_token_str,
+                    key_id=key_id
+                )
+                await session.add(refresh_token_info_obj)
+                await session.flush()
+            return refresh_token_str
 
 
     async def check_refresh_token_exists(self, refresh_token: str) -> bool:
