@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 from typing import Optional, Any, Dict
-from datetime import datetime
+from datetime import datetime, timezone
 from urllib.parse import urljoin
 from http import HTTPStatus
 from uuid import UUID
@@ -82,7 +82,7 @@ class Client:
     def is_jwt_expired(self) -> bool:
         if self._jwt_exp is None:
             return True
-        return datetime.now().timestamp() >= self._jwt_exp
+        return datetime.now(tz=timezone.utc).timestamp() >= self._jwt_exp
 
     @property
     def refresh_token(self) -> Optional[str]:

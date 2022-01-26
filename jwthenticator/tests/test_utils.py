@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 from importlib import reload
 from os import environ
@@ -29,7 +29,7 @@ def _reload_env_vars_get_rsa_key_pair() -> Tuple[str, Optional[str]]:
 @asynccontextmanager
 async def _create_random_file() -> AsyncGenerator[Tuple[str, str], None]:
     random_data = await random_key(8)
-    filename = f"test_tmp_file_{datetime.now()}.txt"
+    filename = f"test_tmp_file_{datetime.now(tz=timezone.utc)}.txt"
     # ignore type due to mypy-aiofiles issues
     async with aiofiles.open(filename, "w", encoding='utf8') as file:  # type: ignore
         await file.write(random_data)
@@ -87,8 +87,8 @@ async def test_get_rsa_key_pair_from_file() -> None:
 @pytest.mark.asyncio
 # Path exists and files do not exist - create them
 async def test_get_rsa_key_pair_create_file() -> None:
-    public_file_name = f"test_tmp_file_{datetime.now()}.txt"
-    private_file_name = f"test_tmp_file_{datetime.now()}.txt"
+    public_file_name = f"test_tmp_file_{datetime.now(tz=timezone.utc)}.txt"
+    private_file_name = f"test_tmp_file_{datetime.now(tz=timezone.utc)}.txt"
     environ[PUBLIC_KEY_PATH_ENV_KEY] = public_file_name
     environ[PRIVATE_KEY_PATH_ENV_KEY] = private_file_name
     try:

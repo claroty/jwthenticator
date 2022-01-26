@@ -4,7 +4,7 @@ from __future__ import absolute_import
 import uuid
 from dataclasses import field
 from typing import Optional, List, ClassVar, Type, Dict, Any
-from datetime import datetime
+from datetime import datetime, timezone
 from collections.abc import Hashable
 
 from marshmallow import Schema, fields, post_dump
@@ -40,7 +40,7 @@ class KeyData:
     key: Optional[str] = field(default=None, repr=False, metadata=dict(load_only=True))
 
     async def is_valid(self) -> bool:
-        return self.expires_at > datetime.now()
+        return self.expires_at > datetime.now(tz=timezone.utc)
 
 
 @dataclass
@@ -53,7 +53,7 @@ class RefreshTokenData:
     key_id: int
 
     async def is_valid(self) -> bool:
-        return self.expires_at > datetime.now()
+        return self.expires_at > datetime.now(tz=timezone.utc)
 
 
 # Skipping None values on dump since 'aud' is optional and can't be None/empty
@@ -68,7 +68,7 @@ class JWTPayloadData:
     aud: Optional[List[str]] = None   # JWT Audience
 
     async def is_valid(self) -> bool:
-        return self.exp > datetime.now().timestamp()
+        return self.exp > datetime.now(tz=timezone.utc).timestamp()
 
 
 # Request dataclasses

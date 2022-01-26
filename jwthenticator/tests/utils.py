@@ -5,7 +5,7 @@ import functools
 import random
 from os import environ
 from string import ascii_letters
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from hashlib import sha512
 from uuid import uuid4
 
@@ -32,7 +32,7 @@ async def hash_key(key: str) -> str:
 
 
 async def future_datetime(seconds: int = 0) -> datetime:
-    return datetime.now() + timedelta(seconds=seconds)
+    return datetime.now(tz=timezone.utc) + timedelta(seconds=seconds)
 
 
 def backup_environment(func):  # type: ignore

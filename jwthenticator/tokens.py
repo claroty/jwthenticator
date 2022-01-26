@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 from typing import Optional, List
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from hashlib import sha512
 from uuid import UUID, uuid4
 
@@ -51,7 +51,7 @@ class TokenManager:
         """
         if self.private_key is None:
             raise Exception("Private key required for JWT token creation")
-        now = datetime.now()
+        now = datetime.now(tz=timezone.utc)
         payload = JWTPayloadData(
             token_id=uuid4(),
             identifier=identifier,
@@ -83,8 +83,8 @@ class TokenManager:
         :return: The refresh token created.
         """
         if expires_at is None:
-            expires_at = expires_at = datetime.now() + timedelta(seconds=REFRESH_TOKEN_EXPIRY)
-        if expires_at <= datetime.now():
+            expires_at = expires_at = datetime.now(tz=timezone.utc) + timedelta(seconds=REFRESH_TOKEN_EXPIRY)
+        if expires_at <= datetime.now(tz=timezone.utc):
             raise Exception("Refresh token can't be created in the past")
 
         refresh_token_str = sha512(uuid4().bytes).hexdigest()
