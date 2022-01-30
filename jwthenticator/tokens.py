@@ -12,7 +12,6 @@ from jwthenticator.models import Base, RefreshTokenInfo
 from jwthenticator.schemas import JWTPayloadData, RefreshTokenData
 from jwthenticator.exceptions import InvalidTokenError, MissingJWTError
 from jwthenticator.consts import JWT_ALGORITHM, REFRESH_TOKEN_EXPIRY, JWT_LEASE_TIME, JWT_AUDIENCE, DB_URI
-from jwthenticator.loop_management import db_lock
 
 class TokenManager:
     """
