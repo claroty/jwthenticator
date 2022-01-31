@@ -50,12 +50,12 @@ class TokenManager:
         """
         if self.private_key is None:
             raise Exception("Private key required for JWT token creation")
-        now = datetime.now()
+        utc_now = datetime.utcnow()
         payload = JWTPayloadData(
             token_id=uuid4(),
             identifier=identifier,
-            iat=int(now.timestamp()),
-            exp=int((now + timedelta(seconds=self.jwt_lease_time)).timestamp()),
+            iat=int(utc_now.timestamp()),
+            exp=int((utc_now + timedelta(seconds=self.jwt_lease_time)).timestamp()),
             aud=self.jwt_audience
         )
         encoded_payload = self.jwt_payload_data_schema.dump(payload)
@@ -82,8 +82,8 @@ class TokenManager:
         :return: The refresh token created.
         """
         if expires_at is None:
-            expires_at = expires_at = datetime.now() + timedelta(seconds=REFRESH_TOKEN_EXPIRY)
-        if expires_at <= datetime.now():
+            expires_at = expires_at = datetime.utcnow() + timedelta(seconds=REFRESH_TOKEN_EXPIRY)
+        if expires_at <= datetime.utcnow():
             raise Exception("Refresh token can't be created in the past")
 
         refresh_token_str = sha512(uuid4().bytes).hexdigest()
