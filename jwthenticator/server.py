@@ -16,6 +16,7 @@ from jwthenticator.api import JWThenticatorAPI
 from jwthenticator.utils import get_rsa_key_pair
 from jwthenticator.server_utils import extract_jwt
 from jwthenticator.consts import PORT, URL_PREFIX, DISABLE_EXTERNAL_API, DISABLE_INTERNAL_API
+from jwthenticator.loop_management import main_event_loop
 
 
 class Server:
@@ -59,7 +60,7 @@ class Server:
         ])
 
         if start_server:
-            web.run_app(self.app, port=port)
+            web.run_app(self.app, port=port, loop=main_event_loop)
 
 
     async def authenticate(self, request: web.Request) -> web.Response:

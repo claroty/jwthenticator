@@ -53,18 +53,17 @@ class TestIntegration(AioHTTPTestCase):
     """
 
     async def get_application(self) -> web.Application:
-        self.app = web.Application()
-        self.app.add_routes([web.get("/", secure_endpoint)])
-        return self.app
-
+        server = Server(start_server=False)
+        server.app.add_routes([web.get("/dummy", secure_endpoint)])
+        return server.app
 
     async def setUpAsync(self) -> None:
-        server = Server(start_server=False)
-        runner = web.AppRunner(server.app)
-        await runner.setup()
-        site = web.TCPSite(runner, SERVER_HOST, SERVER_PORT)
-        self.loop.create_task(site.start())
+        self.app = await self.get_application()
+        self.server = await self.get_server(self.app)
+        self.server.port = SERVER_PORT
+        self.client = await self.get_client(self.server)
 
+        await self.client.start_server()
 
     @unittest_run_loop
     async def test_client_and_authenticated_server(self) -> None:
@@ -82,11 +81,11 @@ class TestIntegration(AioHTTPTestCase):
         await client.refresh()
         # Test get_with_auth
         with patch("aiohttp.ClientSession.__aenter__", ContextAwareClient(self.client)):
-            response = await client.get_with_auth("/")
+            response = await client.get_with_auth("/dummy")
             assert response.status == HTTPStatus.OK
 
         # Test client with JWT and see that doesn't try to refresh (will fail if tries)
         client2 = Client(SERVER_URL, uuid_identifier, jwt=client.jwt)
         with patch("aiohttp.ClientSession.__aenter__", ContextAwareClient(self.client)):
-            response = await client2.get_with_auth("/")
+            response = await client2.get_with_auth("/dummy")
             assert response.status == HTTPStatus.OK
