@@ -21,7 +21,7 @@ Base = declarative_base()   # type: Any # pylint: disable=invalid-name
 class KeyInfo(Base):
     __tablename__ = "keys"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    created = Column(DateTime, default=datetime.now)
+    created = Column(DateTime, default=datetime.utcnow())
     expires_at = Column(DateTime)
     key_hash = Column(String(256), unique=True)
     identifier = Column(UUIDType(binary=False), nullable=False)
@@ -30,7 +30,7 @@ class KeyInfo(Base):
 class RefreshTokenInfo(Base):
     __tablename__ = "refresh_tokens"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    created = Column(DateTime, default=datetime.now)
+    created = Column(DateTime, default=datetime.utcnow())
     expires_at = Column(DateTime)
     token = Column(String(512))
     key_id = Column(Integer, ForeignKey("keys.id"))
