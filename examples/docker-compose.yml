@@ -1,20 +1,22 @@
 version: "3"
 
-services:
+# NOTE:  This compose file is for LOCAL connections on a single-user workstation ONLY
+
+services:      
     postgres:
         image: postgres
         ports:
             - 5432:5432
-        network_mode: host
         environment:
-            - POSTGRES_PASSWORD="my-postgres-pass"
+            - POSTGRES_HOST_AUTH_METHOD=trust
+            - POSTGRES_DB=jwthenticator
 
     jwthenticator:
         image: clarotyltd/jwthenticator
         ports:
             - 8080:8080
-        network_mode: host
         environment:
-            - DB_PASS="my-postgres-pass"
+            - DB_NAME=jwthenticator
+            - DB_HOST=postgres
         depends_on:
             - postgres

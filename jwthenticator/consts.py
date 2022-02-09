@@ -1,11 +1,13 @@
 from __future__ import absolute_import
-
 from environs import Env
+from sqlalchemy import create_engine
+
 
 DAYS_TO_SECONDS = lambda x: x * 60 * 24
 
 env = Env()
 
+# This consts.py file is for LOCAL development on a single-user workstation ONLY
 
 # Server consts
 PORT = env.int("PORT", 8080)
@@ -31,12 +33,3 @@ RSA_PUBLIC_KEY_PATH = env("RSA_PUBLIC_KEY_PATH", None)
 RSA_PRIVATE_KEY_PATH = env("RSA_PRIVATE_KEY_PATH", None)
 # If no key is given, used for key generation
 RSA_KEY_STRENGTH = env.int("RSA_KEY_SIZE", 2048)
-
-# DB consts
-DB_CONNECTOR = env.str("DB_CONNECTOR", "postgresql+pg8000")
-DB_USER = env.str("DB_USER", "postgres")
-DB_PASS = env.str("DB_PASS", "")
-DB_HOST = env.str("DB_HOST", "localhost")
-DB_NAME = env.str("DB_NAME", "jwthenticator")
-
-DB_URI = env.str("DB_URI", f"{DB_CONNECTOR}://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}")
