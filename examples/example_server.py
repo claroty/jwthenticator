@@ -21,10 +21,7 @@ async def secure(request: web.Request) -> web.Response:
     return json_response({"success!": True})
 
 
-app.add_routes([
-    web.get("/insecure", insecure),
-    web.get("/secure", secure)
-])
+app.add_routes([web.get("/insecure", insecure), web.get("/secure", secure)])
 
 
 web.run_app(app, port=PORT)
