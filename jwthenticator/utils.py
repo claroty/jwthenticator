@@ -8,7 +8,13 @@ from jwt.utils import base64url_encode
 from Cryptodome.PublicKey import RSA
 from Cryptodome.Hash import SHA1
 
-from jwthenticator.consts import RSA_KEY_STRENGTH, RSA_PUBLIC_KEY, RSA_PRIVATE_KEY, RSA_PUBLIC_KEY_PATH, RSA_PRIVATE_KEY_PATH
+from jwthenticator.consts import (
+    RSA_KEY_STRENGTH,
+    RSA_PUBLIC_KEY,
+    RSA_PRIVATE_KEY,
+    RSA_PUBLIC_KEY_PATH,
+    RSA_PRIVATE_KEY_PATH,
+)
 
 
 def get_rsa_key_pair() -> Tuple[str, Optional[str]]:
@@ -35,20 +41,20 @@ def get_rsa_key_pair() -> Tuple[str, Optional[str]]:
 
 
 def _read_rsa_keys_from_file() -> Tuple[str, Optional[str]]:
-    with open(RSA_PUBLIC_KEY_PATH, 'r', encoding='utf8') as f_obj:
+    with open(RSA_PUBLIC_KEY_PATH, "r", encoding="utf8") as f_obj:
         public_key = f_obj.read()
     private_key = None
     if RSA_PRIVATE_KEY_PATH is not None:
-        with open(RSA_PRIVATE_KEY_PATH, 'r', encoding='utf8') as f_obj:
+        with open(RSA_PRIVATE_KEY_PATH, "r", encoding="utf8") as f_obj:
             private_key = f_obj.read()
     return public_key, private_key
 
 
 def _create_rsa_key_files() -> Tuple[str, Optional[str]]:
     public_key, private_key = create_rsa_key_pair()
-    with open(RSA_PUBLIC_KEY_PATH, 'w', encoding='utf8') as f_obj:
+    with open(RSA_PUBLIC_KEY_PATH, "w", encoding="utf8") as f_obj:
         f_obj.write(public_key)
-    with open(RSA_PRIVATE_KEY_PATH, 'w', encoding='utf8') as f_obj:
+    with open(RSA_PRIVATE_KEY_PATH, "w", encoding="utf8") as f_obj:
         f_obj.write(private_key)
     return public_key, private_key
 

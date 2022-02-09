@@ -10,10 +10,10 @@ from jwthenticator.tests.utils import random_key, hash_key, future_datetime
 
 
 class TestKeys:
-
     def setup_class(self) -> None:
-        self.key_manager = KeyManager() # pylint: disable=attribute-defined-outside-init
-
+        self.key_manager = (
+            KeyManager()
+        )  # pylint: disable=attribute-defined-outside-init
 
     # Create key tests
     @pytest.mark.asyncio
@@ -23,9 +23,10 @@ class TestKeys:
         assert await self.key_manager.check_key_exists(await hash_key(key_a))
 
         key_b = await random_key()
-        assert await self.key_manager.create_key(key_b, uuid4(), await future_datetime())
+        assert await self.key_manager.create_key(
+            key_b, uuid4(), await future_datetime()
+        )
         assert await self.key_manager.check_key_exists(await hash_key(key_b))
-
 
     # Get key tests
     @pytest.mark.asyncio

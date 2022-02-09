@@ -9,7 +9,12 @@ from aiohttp import ClientSession, web
 
 from jwthenticator.schemas import JWTValidateRequest
 from jwthenticator.utils import verify_url, fix_url_path
-from jwthenticator.exceptions import InvalidServerURLError, MissingAuthorizationError, BadAuthorizationError, MissingJWTError
+from jwthenticator.exceptions import (
+    InvalidServerURLError,
+    MissingAuthorizationError,
+    BadAuthorizationError,
+    MissingJWTError,
+)
 
 
 def authenticate(jwthenticator_server: str) -> Any:
@@ -21,9 +26,12 @@ def authenticate(jwthenticator_server: str) -> Any:
     :param jwthenticator_server: The (full) URL of the jwthenticator server.
         For example - http://localhost.
     """
+
     def wrap(func: Callable) -> Any:
         @wraps(func)
-        async def async_wrap(request: web.Request, *args: Any, **kwargs: Dict[Any, Any]) -> web.Response:
+        async def async_wrap(
+            request: web.Request, *args: Any, **kwargs: Dict[Any, Any]
+        ) -> web.Response:
             # Verify jwthenticator_server is a proper URL
             if not verify_url(jwthenticator_server):
                 raise InvalidServerURLError()
@@ -45,6 +53,7 @@ def authenticate(jwthenticator_server: str) -> Any:
             return await func(request, *args, **kwargs)
 
         return async_wrap
+
     return wrap
 
 
@@ -58,7 +67,9 @@ async def verify_jwt(jwthenticator_server: str, jwt: str) -> bool:
     url = urljoin(jwthenticator_server, "validate")
     request = JWTValidateRequest(jwt)
     async with ClientSession() as client:
-        async with client.post(url, json=JWTValidateRequest.Schema().dump(request)) as response:
+        async with client.post(
+            url, json=JWTValidateRequest.Schema().dump(request)
+        ) as response:
             return response.status == HTTPStatus.OK
 
 

@@ -24,7 +24,9 @@ CLIENT_PATCH_FILES = ["client.py"]
 
 
 @authenticate(SERVER_URL)
-async def secure_endpoint(request: web.Request) -> web.Response:    # pylint: disable=unused-argument
+async def secure_endpoint(
+    request: web.Request,
+) -> web.Response:  # pylint: disable=unused-argument
     return web.json_response({}, status=HTTPStatus.OK)
 
 
@@ -34,6 +36,7 @@ class ContextAwareClient:
         `async with ClientSession()...` patching.
     __call__ checks what file is being patched and patches client selectively.
     """
+
     def __init__(self, test_client: TestClient):
         self.test_client = test_client
 

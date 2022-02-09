@@ -6,7 +6,7 @@ from urllib.parse import urljoin
 from http import HTTPStatus
 from uuid import UUID
 
-import jwt as pyjwt # To avoid redfinition in class
+import jwt as pyjwt  # To avoid redfinition in class
 from aiohttp import ClientSession, ClientResponse
 
 from jwthenticator import schemas, exceptions
@@ -25,9 +25,16 @@ class Client:
     """
 
     # pylint: disable=too-many-arguments
-    def __init__(self, jwthenticator_server: str, identifier: UUID, jwt: Optional[str] = None,
-                 refresh_token: Optional[str] = None, key: Optional[str] = None,
-                 verify_ssl: Optional[bool] = None, algorithm: str = JWT_ALGORITHM) -> None:
+    def __init__(
+        self,
+        jwthenticator_server: str,
+        identifier: UUID,
+        jwt: Optional[str] = None,
+        refresh_token: Optional[str] = None,
+        key: Optional[str] = None,
+        verify_ssl: Optional[bool] = None,
+        algorithm: str = JWT_ALGORITHM,
+    ) -> None:
         """
         :param jwthenticator_server: The (full) URL of the jwthenticator server.
             For example - http://localhost:8080/.
@@ -64,7 +71,6 @@ class Client:
         self.refresh_request_schema = schemas.RefreshRequest.Schema()
         self.token_response_schema = schemas.TokenResponse.Schema()
 
-
     @property
     def jwt(self) -> Optional[str]:
         return self._jwt
@@ -74,7 +80,9 @@ class Client:
         self._jwt = value
         if value:
             # Algorithm is given (even though the client doesn't care) since it's required by pyjwt.
-            self._jwt_exp = pyjwt.decode(value, options=JWT_DECODE_OPTIONS, algorithms=[self.algorithm]).get("exp")
+            self._jwt_exp = pyjwt.decode(
+                value, options=JWT_DECODE_OPTIONS, algorithms=[self.algorithm]
+            ).get("exp")
         else:
             self._jwt_exp = None
 
@@ -95,7 +103,6 @@ class Client:
         """
         return {"Authorization": f"Bearer {self.jwt}"}
 
-
     async def refresh(self, auth_on_fail: bool = True) -> None:
         """
         Perfrom "refresh" request.
@@ -108,7 +115,9 @@ class Client:
         url = urljoin(self.jwthenticator_server, "refresh")
         request = schemas.RefreshRequest(self._refresh_token, self.identifier)
         async with ClientSession() as client:
-            async with client.post(url, json=self.refresh_request_schema.dump(request), ssl=self.verify_ssl) as response:
+            async with client.post(
+                url, json=self.refresh_request_schema.dump(request), ssl=self.verify_ssl
+            ) as response:
 
                 if response.status != HTTPStatus.OK:
                     if response.status == HTTPStatus.UNAUTHORIZED:
@@ -122,7 +131,6 @@ class Client:
         result = self.token_response_schema.load(token_response_data)
         self.jwt = result.jwt
 
-
     async def authenticate(self) -> None:
         """
         Perform "authenticate" request.
@@ -134,7 +142,9 @@ class Client:
         url = urljoin(self.jwthenticator_server, "authenticate")
         request = schemas.AuthRequest(self._key, self.identifier)
         async with ClientSession() as client:
-            async with client.post(url, json=self.auth_request_schema.dump(request), ssl=self.verify_ssl) as response:
+            async with client.post(
+                url, json=self.auth_request_schema.dump(request), ssl=self.verify_ssl
+            ) as response:
 
                 if response.status != HTTPStatus.OK:
                     if response.status == HTTPStatus.UNAUTHORIZED:
@@ -145,10 +155,13 @@ class Client:
 
         result = self.token_response_schema.load(token_response_data)
         self.jwt = result.jwt
-        self._refresh_token = result.refresh_token if result.refresh_token else self._refresh_token
+        self._refresh_token = (
+            result.refresh_token if result.refresh_token else self._refresh_token
+        )
 
-
-    async def _make_request(self, method: str, url: str, **kwargs: Dict[str, Any]) -> ClientResponse:
+    async def _make_request(
+        self, method: str, url: str, **kwargs: Dict[str, Any]
+    ) -> ClientResponse:
         """
         Add auth headers and make actually make the request.
         """
@@ -159,8 +172,9 @@ class Client:
             response = await client.request(method, url, ssl=self.verify_ssl, **kwargs)
         return response
 
-
-    async def request_with_auth(self, method: str, url: str, **kwargs: Dict[str, Any]) -> ClientResponse:
+    async def request_with_auth(
+        self, method: str, url: str, **kwargs: Dict[str, Any]
+    ) -> ClientResponse:
         """
         Perform request with authentication headers.
         """
@@ -179,20 +193,19 @@ class Client:
 
         return response
 
-
     async def get_with_auth(self, url: str, **kwargs: Dict[str, Any]) -> ClientResponse:
         """
         Perform get request with JWT header.
         """
         return await self.request_with_auth("GET", url, **kwargs)
 
-
-    async def post_with_auth(self, url: str, **kwargs: Dict[str, Any]) -> ClientResponse:
+    async def post_with_auth(
+        self, url: str, **kwargs: Dict[str, Any]
+    ) -> ClientResponse:
         """
         Perform post request with JWT header.
         """
         return await self.request_with_auth("POST", url, **kwargs)
-
 
 
 class InternalClient:
@@ -201,7 +214,12 @@ class InternalClient:
     All function in this class are async.
     """
 
-    def __init__(self, jwthenticator_server: str, identifier: UUID, verify_ssl: Optional[bool] = None) -> None:
+    def __init__(
+        self,
+        jwthenticator_server: str,
+        identifier: UUID,
+        verify_ssl: Optional[bool] = None,
+    ) -> None:
         """
         :param jwthenticator_server: The (full) URL of the jwthenticator server.
             For example - http://localhost:8080/.
@@ -223,7 +241,6 @@ class InternalClient:
         self.key_request_schema = schemas.KeyRequest.Schema()
         self.bool_response_schema = schemas.BoolResponse.Schema()
 
-
     async def register_key(self, key: str) -> None:
         """
         Register a key to the jwthenticator server.
@@ -233,7 +250,11 @@ class InternalClient:
         url = urljoin(self.jwthenticator_server, "register_key")
         request = schemas.RegisterKeyRequest(key, self.identifier)
         async with ClientSession() as client:
-            async with client.post(url, json=self.register_key_request_schema.dump(request), ssl=self.verify_ssl) as response:
+            async with client.post(
+                url,
+                json=self.register_key_request_schema.dump(request),
+                ssl=self.verify_ssl,
+            ) as response:
 
                 if response.status != HTTPStatus.CREATED:
                     raise exceptions.RegisterKeyError(response.status)
@@ -244,7 +265,6 @@ class InternalClient:
         if not result.result:
             raise exceptions.RegisterKeyError(result.message)
 
-
     async def is_key_registered(self, key: str) -> bool:
         """
         Check if a key is already registered in the jwthenticator server.
@@ -254,7 +274,9 @@ class InternalClient:
         url = urljoin(self.jwthenticator_server, "is_key_registered")
         request = schemas.KeyRequest(key)
         async with ClientSession() as client:
-            async with client.post(url, json=self.key_request_schema.dump(request), ssl=self.verify_ssl) as response:
+            async with client.post(
+                url, json=self.key_request_schema.dump(request), ssl=self.verify_ssl
+            ) as response:
 
                 if response.status != HTTPStatus.OK:
                     raise exceptions.IsKeyRegisteredError(response.status)

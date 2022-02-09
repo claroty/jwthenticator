@@ -24,7 +24,8 @@ class BaseSchema(Schema):
     # pylint: disable=unused-argument
     def remove_skip_values(self, data: Any, many: bool) -> Dict[Any, Any]:
         return {
-            key: value for key, value in data.items()
+            key: value
+            for key, value in data.items()
             if not isinstance(value, Hashable) or value not in self.SKIP_VALUES
         }
 
@@ -61,11 +62,11 @@ class RefreshTokenData:
 @dataclass
 class JWTPayloadData:
     Schema: ClassVar[Type[Schema]] = Schema
-    token_id: UUID   # JWT token identifier
-    identifier: UUID # Identifier of who the JWT was issued to
-    iat: int    # Issued at timestamp
-    exp: int    # Expires at timestamp
-    aud: Optional[List[str]] = None   # JWT Audience
+    token_id: UUID  # JWT token identifier
+    identifier: UUID  # Identifier of who the JWT was issued to
+    iat: int  # Issued at timestamp
+    exp: int  # Expires at timestamp
+    aud: Optional[List[str]] = None  # JWT Audience
 
     async def is_valid(self) -> bool:
         return self.exp > datetime.utcnow().timestamp()
@@ -80,7 +81,7 @@ class KeyRequest:
 
 @dataclass
 class RegisterKeyRequest(KeyRequest):
-    identifier: UUID # Identifier of who the JWT was issued to
+    identifier: UUID  # Identifier of who the JWT was issued to
 
 
 @dataclass
@@ -119,19 +120,20 @@ class BoolResponse:
 
 
 @dataclass
-class JWKPayload:   # pylint: disable=too-many-instance-attributes
+class JWKPayload:  # pylint: disable=too-many-instance-attributes
     """
     See https://auth0.com/docs/tokens/json-web-tokens/json-web-key-set-properties
     """
+
     Schema: ClassVar[Type[Schema]] = Schema
     x5c: List[str]  # x.509 certificate chain
-    n: bytes    # RSA public key modulus
-    e: bytes    # RSA public key exponent
-    x5t: str    # x.509 SHA-1 thumbprint
-    kid: str    # Unique key identifier
-    alg: str = JWT_ALGORITHM    # Key algorithm
-    kty: str = JWT_ALGORITHM_FAMILY # Key algorithm family
-    use: str = "sig"    # How key will be used, sig (signature) by default
+    n: bytes  # RSA public key modulus
+    e: bytes  # RSA public key exponent
+    x5t: str  # x.509 SHA-1 thumbprint
+    kid: str  # Unique key identifier
+    alg: str = JWT_ALGORITHM  # Key algorithm
+    kty: str = JWT_ALGORITHM_FAMILY  # Key algorithm family
+    use: str = "sig"  # How key will be used, sig (signature) by default
 
 
 @dataclass

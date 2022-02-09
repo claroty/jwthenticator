@@ -15,7 +15,7 @@ from jwthenticator.consts import DB_URI
 engine = create_engine(DB_URI)
 SessionMaker = sessionmaker(bind=engine)
 
-Base = declarative_base()   # type: Any # pylint: disable=invalid-name
+Base = declarative_base()  # type: Any # pylint: disable=invalid-name
 
 
 class KeyInfo(Base):

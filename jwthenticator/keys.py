@@ -22,8 +22,9 @@ class KeyManager:
         self.session_factory = create_session_factory(DB_URI, Base)
         self.key_schema = KeyData.Schema()
 
-
-    async def create_key(self, key: str, identifier: UUID, expires_at: Optional[datetime] = None) -> bool:
+    async def create_key(
+        self, key: str, identifier: UUID, expires_at: Optional[datetime] = None
+    ) -> bool:
         """
         Add a new key to database.
         Will update the key's expiry date if key already exists.
@@ -39,14 +40,11 @@ class KeyManager:
             return await self.update_key_expiry(key_hash, expires_at)
 
         key_obj = KeyInfo(
-            expires_at=expires_at,
-            key_hash=key_hash,
-            identifier=identifier
+            expires_at=expires_at, key_hash=key_hash, identifier=identifier
         )
         async with self.session_factory() as session:
             await session.add(key_obj)
         return True
-
 
     async def check_key_exists(self, key_hash: str) -> bool:
         """
@@ -57,7 +55,6 @@ class KeyManager:
                 return True
         return False
 
-
     async def update_key_expiry(self, key_hash: str, expires_at: datetime) -> bool:
         """
         Update the expiry date of an existing key.
@@ -65,10 +62,11 @@ class KeyManager:
         if not await self.check_key_exists(key_hash):
             raise InvalidKeyError("Invalid key")
         async with self.session_factory() as session:
-            key_info_obj = await session.query(KeyInfo).filter_by(key_hash=key_hash).first()
+            key_info_obj = (
+                await session.query(KeyInfo).filter_by(key_hash=key_hash).first()
+            )
             key_info_obj.expires_at = expires_at
         return True
-
 
     async def get_key(self, key_hash: str) -> KeyData:
         """
@@ -77,6 +75,8 @@ class KeyManager:
         if not await self.check_key_exists(key_hash):
             raise InvalidKeyError("Invalid key")
         async with self.session_factory() as session:
-            key_info_obj = await session.query(KeyInfo).filter_by(key_hash=key_hash).first()
+            key_info_obj = (
+                await session.query(KeyInfo).filter_by(key_hash=key_hash).first()
+            )
             key_data_obj = self.key_schema.load((self.key_schema.dump(key_info_obj)))
             return key_data_obj

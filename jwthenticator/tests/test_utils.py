@@ -31,7 +31,7 @@ async def _create_random_file() -> AsyncGenerator[Tuple[str, str], None]:
     random_data = await random_key(8)
     filename = f"test_tmp_file_{datetime.now()}.txt"
     # ignore type due to mypy-aiofiles issues
-    async with aiofiles.open(filename, "w", encoding='utf8') as file:  # type: ignore
+    async with aiofiles.open(filename, "w", encoding="utf8") as file:  # type: ignore
         await file.write(random_data)
     try:
         yield filename, random_data
@@ -72,8 +72,13 @@ async def test_get_rsa_key_pair_no_input() -> None:
 # File exists - read keys
 async def test_get_rsa_key_pair_from_file() -> None:
     # Pylint sets a false positive
-    async with _create_random_file() as (private_file_name, private_file_data), \
-            _create_random_file() as (public_file_name, public_file_data):  # pylint: disable=not-async-context-manager
+    async with _create_random_file() as (
+        private_file_name,
+        private_file_data,
+    ), _create_random_file() as (
+        public_file_name,
+        public_file_data,
+    ):  # pylint: disable=not-async-context-manager
         environ[PUBLIC_KEY_PATH_ENV_KEY] = public_file_name
         environ[PRIVATE_KEY_PATH_ENV_KEY] = private_file_name
         public_key, private_key = _reload_env_vars_get_rsa_key_pair()
@@ -94,9 +99,9 @@ async def test_get_rsa_key_pair_create_file() -> None:
     try:
         public_key, private_key = _reload_env_vars_get_rsa_key_pair()
         # ignore type due to mypy-aiofiles issues
-        async with aiofiles.open(public_file_name, 'r', encoding='utf8') as file:  # type: ignore
+        async with aiofiles.open(public_file_name, "r", encoding="utf8") as file:  # type: ignore
             public_key_from_file = await file.read()
-        async with aiofiles.open(private_file_name, 'r', encoding='utf8') as file:  # type: ignore
+        async with aiofiles.open(private_file_name, "r", encoding="utf8") as file:  # type: ignore
             private_key_from_file = await file.read()
         assert public_key_from_file == public_key
         assert private_key_from_file == private_key

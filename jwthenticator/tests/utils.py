@@ -46,4 +46,5 @@ def backup_environment(func):  # type: ignore
             environ.update(_environ_copy)
             reload(consts)
             reload(utils)
+
     return wrapper
