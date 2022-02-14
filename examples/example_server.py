@@ -13,12 +13,12 @@ app = web.Application()
 
 
 async def insecure(request: web.Request) -> web.Response:
-    return json_response({"success!": True})
+    return json_response({"BOO, YOU ARE NOT AUTHENTICATED!": True})
 
 
 @authenticate(JWTHENTICATOR_HOST)
 async def secure(request: web.Request) -> web.Response:
-    return json_response({"success!": True})
+    return json_response({"CONGRATS YOU ARE AUTHENTICATED!": True})
 
 
 app.add_routes([
