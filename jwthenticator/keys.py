@@ -43,7 +43,8 @@ class KeyManager:
             identifier=identifier
         )
         async with self.async_session_factory() as session:
-            await session.add(key_obj)
+            async with session.begin():
+                await session.add(key_obj)
         return True
 
 
