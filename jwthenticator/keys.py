@@ -52,9 +52,7 @@ class KeyManager:
         Check if a key exists in DB.
         """
         async with self.async_session_factory() as session:
-            if await session.query(KeyInfo).filter_by(key_hash=key_hash).count() == 1:
-                return True
-        return False
+            return await session.query(KeyInfo).filter_by(key_hash=key_hash).count() == 1
 
 
     async def update_key_expiry(self, key_hash: str, expires_at: datetime) -> bool:

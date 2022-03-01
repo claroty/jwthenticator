@@ -103,9 +103,7 @@ class TokenManager:
         Check if a refresh token exists in DB.
         """
         async with self.async_session_factory() as session:
-            if await session.query(RefreshTokenInfo).filter_by(token=refresh_token).count() == 1:
-                return True
-        return False
+            return await session.query(RefreshTokenInfo).filter_by(token=refresh_token).count() == 1
 
 
     async def load_refresh_token(self, refresh_token: str) -> RefreshTokenData:
