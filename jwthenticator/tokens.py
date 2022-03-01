@@ -6,9 +6,9 @@ from hashlib import sha512
 from uuid import UUID, uuid4
 
 import jwt
-from asyncalchemy import create_session_factory
 
 from jwthenticator.models import Base, RefreshTokenInfo
+from jwthenticator.utils import create_async_session_factory
 from jwthenticator.schemas import JWTPayloadData, RefreshTokenData
 from jwthenticator.exceptions import InvalidTokenError, MissingJWTError
 from jwthenticator.consts import JWT_ALGORITHM, REFRESH_TOKEN_EXPIRY, JWT_LEASE_TIME, JWT_AUDIENCE, DB_URI
@@ -39,7 +39,7 @@ class TokenManager:
         self.refresh_token_schema = RefreshTokenData.Schema()
         self.jwt_payload_data_schema = JWTPayloadData.Schema()
 
-        self.session_factory = create_session_factory(DB_URI, Base)
+        self.async_session_factory = create_async_session_factory(DB_URI, Base)
 
 
     async def create_access_token(self, identifier: UUID) -> str:
@@ -87,7 +87,7 @@ class TokenManager:
             raise Exception("Refresh token can't be created in the past")
 
         refresh_token_str = sha512(uuid4().bytes).hexdigest()
-        async with self.session_factory() as session:
+        async with self.async_session_factory() as session:
             refresh_token_info_obj = RefreshTokenInfo(
                 expires_at=expires_at,
                 token=refresh_token_str,
@@ -102,7 +102,7 @@ class TokenManager:
         """
         Check if a refresh token exists in DB.
         """
-        async with self.session_factory() as session:
+        async with self.async_session_factory() as session:
             if await session.query(RefreshTokenInfo).filter_by(token=refresh_token).count() == 1:
                 return True
         return False
@@ -114,7 +114,7 @@ class TokenManager:
         """
         if not await self.check_refresh_token_exists(refresh_token):
             raise InvalidTokenError("Invalid refresh token")
-        async with self.session_factory() as session:
+        async with self.async_session_factory() as session:
             refresh_token_info_obj = await session.query(RefreshTokenInfo).filter_by(token=refresh_token).first()
             refresh_token_data_obj = self.refresh_token_schema.load(self.refresh_token_schema.dump(refresh_token_info_obj))
             return refresh_token_data_obj

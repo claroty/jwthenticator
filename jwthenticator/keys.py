@@ -5,12 +5,11 @@ from datetime import datetime, timedelta
 from hashlib import sha512
 from uuid import UUID
 
-from asyncalchemy import create_session_factory
-
 from jwthenticator.schemas import KeyData
 from jwthenticator.models import Base, KeyInfo
 from jwthenticator.exceptions import InvalidKeyError
 from jwthenticator.consts import KEY_EXPIRY, DB_URI
+from jwthenticator.utils import create_async_session_factory
 
 
 class KeyManager:
@@ -19,7 +18,7 @@ class KeyManager:
     """
 
     def __init__(self) -> None:
-        self.session_factory = create_session_factory(DB_URI, Base)
+        self.async_session_factory = create_async_session_factory(DB_URI, Base)
         self.key_schema = KeyData.Schema()
 
 
@@ -43,7 +42,7 @@ class KeyManager:
             key_hash=key_hash,
             identifier=identifier
         )
-        async with self.session_factory() as session:
+        async with self.async_session_factory() as session:
             await session.add(key_obj)
         return True
 
@@ -52,7 +51,7 @@ class KeyManager:
         """
         Check if a key exists in DB.
         """
-        async with self.session_factory() as session:
+        async with self.async_session_factory() as session:
             if await session.query(KeyInfo).filter_by(key_hash=key_hash).count() == 1:
                 return True
         return False
@@ -64,7 +63,7 @@ class KeyManager:
         """
         if not await self.check_key_exists(key_hash):
             raise InvalidKeyError("Invalid key")
-        async with self.session_factory() as session:
+        async with self.async_session_factory() as session:
             key_info_obj = await session.query(KeyInfo).filter_by(key_hash=key_hash).first()
             key_info_obj.expires_at = expires_at
         return True
@@ -76,7 +75,7 @@ class KeyManager:
         """
         if not await self.check_key_exists(key_hash):
             raise InvalidKeyError("Invalid key")
-        async with self.session_factory() as session:
+        async with self.async_session_factory() as session:
             key_info_obj = await session.query(KeyInfo).filter_by(key_hash=key_hash).first()
             key_data_obj = self.key_schema.load((self.key_schema.dump(key_info_obj)))
             return key_data_obj
