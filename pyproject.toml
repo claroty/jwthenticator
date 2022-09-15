@@ -37,6 +37,7 @@ diagrams = "^0.17.0"
 mock = "^4.0.3"
 async_generator = "^1.10"
 aiofiles = "^0.7.0"
+typing-inspect = "0.7.1" # https://github.com/lovasoa/marshmallow_dataclass/issues/206
 
 
 [tool.pylint.message_control]
