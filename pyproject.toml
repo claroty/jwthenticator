@@ -22,7 +22,6 @@ cryptography = ">= 2.8, < 39.0.0"   # Required for pyjwt
 marshmallow = "3.17.0"
 marshmallow-dataclass = "^8.3"
 pycryptodomex = "^3.9"
-dataclasses = { version = "^0.7", python = "~3.9" }
 environs = "^9.3.1"
 
 
