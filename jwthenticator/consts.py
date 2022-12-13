@@ -17,7 +17,7 @@ DISABLE_INTERNAL_API = env.bool("DISABLE_INTERNAL_API", False)
 # JWT consts
 JWT_ALGORITHM = env.str("JWT_ALGORITHM", "RS256")
 JWT_ALGORITHM_FAMILY = env.str("JWT_ALGORITHM_FAMILY", "RSA")
-JWT_LEASE_TIME = env.int("JWT_LEASE_TIME", 30 * 60) # In seconds - 30 minutes
+JWT_LEASE_TIME = env.int("JWT_LEASE_TIME", 25 * 3600) # In seconnds - 25 hours to allow for client time zone issues
 JWT_AUDIENCE = env.list("JWT_AUDIENCE", [])
 
 # Token consts
