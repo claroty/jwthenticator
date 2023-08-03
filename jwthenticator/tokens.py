@@ -6,9 +6,9 @@ from hashlib import sha512
 from uuid import UUID, uuid4
 
 import jwt
-from asyncalchemy import create_session_factory
-
-from jwthenticator.models import Base, RefreshTokenInfo
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import sessionmaker
+from jwthenticator.models import RefreshTokenInfo
 from jwthenticator.schemas import JWTPayloadData, RefreshTokenData
 from jwthenticator.exceptions import InvalidTokenError, MissingJWTError
 from jwthenticator.consts import JWT_ALGORITHM, REFRESH_TOKEN_EXPIRY, JWT_LEASE_TIME, JWT_AUDIENCE, DB_URI
@@ -39,8 +39,8 @@ class TokenManager:
         self.refresh_token_schema = RefreshTokenData.Schema()
         self.jwt_payload_data_schema = JWTPayloadData.Schema()
 
-        self.session_factory = create_session_factory(DB_URI, Base)
-
+        self.async_engine = create_async_engine(DB_URI)
+        self.session_factory = sessionmaker(self.async_engine, expire_on_commit=False, class_=AsyncSession)
 
     async def create_access_token(self, identifier: UUID) -> str:
         """

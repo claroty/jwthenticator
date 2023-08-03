@@ -5,10 +5,10 @@ from datetime import datetime, timedelta
 from hashlib import sha512
 from uuid import UUID
 
-from asyncalchemy import create_session_factory
-
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import sessionmaker
 from jwthenticator.schemas import KeyData
-from jwthenticator.models import Base, KeyInfo
+from jwthenticator.models import KeyInfo
 from jwthenticator.exceptions import InvalidKeyError
 from jwthenticator.consts import KEY_EXPIRY, DB_URI
 
@@ -19,7 +19,8 @@ class KeyManager:
     """
 
     def __init__(self) -> None:
-        self.session_factory = create_session_factory(DB_URI, Base)
+        self.async_engine = create_async_engine(DB_URI)
+        self.session_factory = sessionmaker(self.async_engine, expire_on_commit=False, class_=AsyncSession)
         self.key_schema = KeyData.Schema()
 
 
