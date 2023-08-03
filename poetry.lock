@@ -160,20 +160,6 @@ files = [
 ]
 
 [[package]]
-name = "asyncalchemy"
-version = "1.1.1"
-description = "A thin async wrapper for SQLAlchemy sessions."
-optional = false
-python-versions = ">=3.6,<4.0"
-files = [
-    {file = "asyncalchemy-1.1.1-py3-none-any.whl", hash = "sha256:276010d5bb9c66ddcb831b8e4caa8d2414b439d9383e3c7d566b8697475087e3"},
-    {file = "asyncalchemy-1.1.1.tar.gz", hash = "sha256:bd62cb2e02af27db5940b9dfb22877d3384165caba1b25bc11e5710489a8e802"},
-]
-
-[package.dependencies]
-sqlalchemy = ">=1.2.0,<2.0.0"
-
-[[package]]
 name = "atomicwrites"
 version = "1.4.1"
 description = "Atomic file writes."
@@ -914,13 +900,13 @@ pyparsing = ">=2.0.2,<3.0.5 || >3.0.5"
 
 [[package]]
 name = "pg8000"
-version = "1.16.5"
+version = "1.16.6"
 description = "PostgreSQL interface library"
 optional = false
 python-versions = ">=3.5"
 files = [
-    {file = "pg8000-1.16.5-py3-none-any.whl", hash = "sha256:3d646b11227d94a3130a765a981dc6323bc959a3cd6ed54421d174b2ef256087"},
-    {file = "pg8000-1.16.5.tar.gz", hash = "sha256:8af70cdfcc1fadafa32468a6af563e1c0b5271c4dcc99a4490030a128cb295a3"},
+    {file = "pg8000-1.16.6-py3-none-any.whl", hash = "sha256:66fa16a402f38f8ba664206b4ba4040f24ea9641c4205b2b96a1ff3a613de3be"},
+    {file = "pg8000-1.16.6.tar.gz", hash = "sha256:8fc1e6a62ccb7c9830f1e7e9288e2d20eaf373cc8875b5c55b7d5d9b7717be91"},
 ]
 
 [package.dependencies]
@@ -1522,4 +1508,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "63a828c082a28aabe4d6a78e5c2b0bb738f098f3957d6903c333118ea3b83f1e"
+content-hash = "526c8ccf8ea1d3f009579b49e246620ca52562aadcd9b3dc3a893e452db5ca30"

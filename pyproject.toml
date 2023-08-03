@@ -13,9 +13,8 @@ exclude = ["jwthenticator/tests"]
 [tool.poetry.dependencies]
 python = "^3.9"
 sqlalchemy = "1.4.0"
-asyncalchemy = "^1.1.1"
 sqlalchemy-utils = ">=0.33.0, < 1.0.0"
-pg8000 = "1.16.5"   # Constant due to - https://github.com/tlocke/pg8000/issues/53
+pg8000 = "1.16.6"   # Constant due to - https://github.com/tlocke/pg8000/issues/53
 aiohttp = "^3.6.0"
 pyjwt = ">= 1.7, < 3.0.0"
 cryptography = ">= 2.8, < 40.0.0"   # Required for pyjwt
@@ -59,6 +58,54 @@ ignored-classes = [
 enable = true
 
 
+[tool.pdm]
+[tool.pdm.dev-dependencies]
+dev = [
+    "mypy<1.0,>=0.790",
+    "pylint<3.0,>=2.6",
+    "pytest<7.0,>=6.1",
+    "pytest-asyncio<1.0,>=0.14",
+    "pytest-aiohttp<1.0,>=0.3",
+    "freezegun<2.0,>=1.0",
+    "pyjwt<3.0,>=2.0",
+    "diagrams<1.0.0,>=0.17.0",
+    "mock<5.0.0,>=4.0.3",
+    "async-generator<2.0,>=1.10",
+    "aiofiles<1.0.0,>=0.7.0",
+    "typing-inspect==0.7.1",
+]
+
+[tool.pdm.build]
+includes = []
+excludes = ["jwthenticator/tests"]
 [build-system]
 requires = ["poetry>=1.0.2", "poetry-dynamic-versioning"]
 build-backend = "poetry.masonry.api"
+
+[project]
+authors = [
+    {name = "Guy Zylberberg", email = "guyzyl@gmail.com"},
+    {name = "Claroty Open Source", email = "opensource@claroty.com"},
+]
+requires-python = ">=3.9,<4.0"
+dependencies = [
+    "sqlalchemy==1.4.0",
+    "sqlalchemy-utils<1.0.0,>=0.33.0",
+    "pg8000==1.16.5",
+    "aiohttp<4.0.0,>=3.6.0",
+    "pyjwt<3.0.0,>=1.7",
+    "cryptography<40.0.0,>=2.8",
+    "marshmallow<4.0,>=3.9",
+    "marshmallow-dataclass<9.0,>=8.3",
+    "pycryptodomex<4.0,>=3.9",
+    "environs<10.0.0,>=9.3.1",
+]
+name = "jwthenticator"
+version = "0.0.0"
+description = "A cloud first service for key to JWT authentication library and server written in Python 3."
+readme = "README.md"
+license = {text = "Apache-2.0"}
+
+[project.urls]
+homepage = "https://github.com/claroty/jwthenticator"
+documentation = "https://github.com/claroty/jwthenticator"
