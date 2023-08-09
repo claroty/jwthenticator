@@ -34,7 +34,7 @@ RSA_PRIVATE_KEY_PATH = env("RSA_PRIVATE_KEY_PATH", None)
 RSA_KEY_STRENGTH = env.int("RSA_KEY_SIZE", 2048)
 
 # DB consts
-DB_CONNECTOR = env.str("DB_CONNECTOR", "postgresql+pg8000")
+DB_CONNECTOR = env.str("DB_CONNECTOR", "postgresql+asyncpg")
 DB_USER = env.str("DB_USER", "postgres")
 DB_PASS = env.str("DB_PASS", "")
 DB_HOST = env.str("DB_HOST", "localhost")
