@@ -11,17 +11,16 @@ exclude = ["jwthenticator/tests"]
 
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.9"
 sqlalchemy = "^1.4.31"
 sqlalchemy-utils = "^0.33.0"
-pg8000 = "^1.16.5"
+pg8000 = "1.16.5"   # Constant due to - https://github.com/tlocke/pg8000/issues/53
 aiohttp = "^3.6.0"
 pyjwt = ">= 1.7, < 3.0.0"
-cryptography = ">= 2.8, < 4.0.0"   # Required for pyjwt
+cryptography = ">=37,<42"   # Required for pyjwt
 marshmallow = "^3.9"
 marshmallow-dataclass = "^8.3"
 pycryptodomex = "^3.9"
-dataclasses = { version = "^0.7", python = "~3.6" }
 environs = "^9.3.1"
 
 
@@ -37,6 +36,7 @@ diagrams = "^0.17.0"
 mock = "^4.0.3"
 async_generator = "^1.10"
 aiofiles = "^0.7.0"
+typing-inspect = "0.7.1" # https://github.com/lovasoa/marshmallow_dataclass/issues/206
 
 
 [tool.pylint.message_control]

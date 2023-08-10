@@ -2,7 +2,8 @@ from __future__ import absolute_import
 
 from environs import Env
 
-DAYS_TO_SECONDS = lambda x: x * 60 * 24
+def days_to_seconds(days: int) -> int:
+    return days * 60 * 24
 
 env = Env()
 
@@ -16,12 +17,12 @@ DISABLE_INTERNAL_API = env.bool("DISABLE_INTERNAL_API", False)
 # JWT consts
 JWT_ALGORITHM = env.str("JWT_ALGORITHM", "RS256")
 JWT_ALGORITHM_FAMILY = env.str("JWT_ALGORITHM_FAMILY", "RSA")
-JWT_LEASE_TIME = env.int("JWT_LEASE_TIME", 30 * 60) # In seconds - 30 minutes
+JWT_LEASE_TIME = env.int("JWT_LEASE_TIME", 25 * 3600) # In seconnds - 25 hours to allow for client time zone issues
 JWT_AUDIENCE = env.list("JWT_AUDIENCE", [])
 
 # Token consts
-KEY_EXPIRY = env.int("KEY_EXPIRY", DAYS_TO_SECONDS(120))  # In seconds
-REFRESH_TOKEN_EXPIRY = env.int("REFRESH_TOKEN_EXPIRY", DAYS_TO_SECONDS(60))   # In seconds
+KEY_EXPIRY = env.int("KEY_EXPIRY", days_to_seconds(120))  # In seconds
+REFRESH_TOKEN_EXPIRY = env.int("REFRESH_TOKEN_EXPIRY", days_to_seconds(60))   # In seconds
 
 # Keys from env
 RSA_PUBLIC_KEY = env("RSA_PUBLIC_KEY", None)

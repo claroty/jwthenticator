@@ -10,7 +10,7 @@ from unittest.mock import patch
 
 from aiohttp import web, ClientSession
 from aiohttp.client import ClientSession as ClientSessionType
-from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop, TestClient
+from aiohttp.test_utils import AioHTTPTestCase, TestClient
 
 from jwthenticator.server import Server
 from jwthenticator.client import Client, InternalClient
@@ -65,7 +65,6 @@ class TestIntegration(AioHTTPTestCase):
 
         await self.client.start_server()
 
-    @unittest_run_loop
     async def test_client_and_authenticated_server(self) -> None:
         key = await random_key()
         uuid_identifier = uuid4()

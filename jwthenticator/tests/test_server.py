@@ -5,7 +5,7 @@ from uuid import uuid4
 from http import HTTPStatus
 from unittest.mock import MagicMock
 
-from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
+from aiohttp.test_utils import AioHTTPTestCase
 from aiohttp.web import Application
 from jwt import PyJWKClient
 
@@ -59,7 +59,6 @@ class TestServer(AioHTTPTestCase):
 
 
     # Sanity Tests
-    @unittest_run_loop
     async def test_full_flow(self) -> None:
         key = await random_key()
         uuid_identifier = uuid4()
@@ -107,14 +106,12 @@ class TestServer(AioHTTPTestCase):
         assert jwks_client.get_signing_key_from_jwt(token)
 
 
-    @unittest_run_loop
     async def test_bad_json_request(self) -> None:
         for route in POST_ROUTES:
             response = await self.client.post(route, json="{")
             assert response.status == HTTPStatus.BAD_REQUEST
 
     # Authenticate Tests
-    @unittest_run_loop
     async def test_authentication_bad_request(self) -> None:
         # Missing field
         request = {"key": await random_key()}
@@ -126,13 +123,11 @@ class TestServer(AioHTTPTestCase):
         response = await self.client.post("/authenticate", json=request)
         assert response.status == HTTPStatus.BAD_REQUEST
 
-    @unittest_run_loop
     async def test_authentication_unknown_key(self) -> None:
         request = self.auth_request_schema.dump(AuthRequest(key=await random_key(), identifier=uuid4()))
         response = await self.client.post("/authenticate", json=request)
         assert response.status == HTTPStatus.UNAUTHORIZED
 
-    @unittest_run_loop
     async def test_authentication_expired_key(self) -> None:
         key = await self.register_key()
         request = self.auth_request_schema.dump(AuthRequest(key=key, identifier=uuid4()))
@@ -142,7 +137,6 @@ class TestServer(AioHTTPTestCase):
             assert response.status == HTTPStatus.UNAUTHORIZED
 
     # Refresh Tests
-    @unittest_run_loop
     async def test_refresh_bad_request(self) -> None:
         # Missing field
         request = {"refresh_token": await random_refresh_token()}
@@ -154,13 +148,11 @@ class TestServer(AioHTTPTestCase):
         response = await self.client.post("/refresh", json=request)
         assert response.status == HTTPStatus.BAD_REQUEST
 
-    @unittest_run_loop
     async def test_refresh_unknown_refresh_token(self) -> None:
         request = self.refresh_request_schema.dump(RefreshRequest(refresh_token=await random_refresh_token(), identifier=uuid4()))
         response = await self.client.post("/refresh", json=request)
         assert response.status == HTTPStatus.UNAUTHORIZED
 
-    @unittest_run_loop
     async def test_refresh_expired_refresh_token(self) -> None:
         token_response_obj = await self.perform_auth()
         request = self.refresh_request_schema.dump(RefreshRequest(refresh_token=token_response_obj.refresh_token, identifier=uuid4()))  # type: ignore
@@ -171,7 +163,6 @@ class TestServer(AioHTTPTestCase):
             assert response.status == HTTPStatus.UNAUTHORIZED
 
     # Validate Tests
-    @unittest_run_loop
     async def test_validate_bad_request(self) -> None:
         # Missing field
         response = await self.client.post("/validate", json={})
@@ -182,7 +173,6 @@ class TestServer(AioHTTPTestCase):
         response = await self.client.post("/validate", json=request)
         assert response.status == HTTPStatus.BAD_REQUEST
 
-    @unittest_run_loop
     async def test_validate_bad_jwt(self) -> None:
         token_response_obj = await self.perform_auth()
         request = self.jwt_validate_request_schema.dump(JWTValidateRequest(jwt=token_response_obj.jwt[:-2]))
@@ -193,7 +183,6 @@ class TestServer(AioHTTPTestCase):
         response = await self.client.post("/validate", json=request)
         assert response.status == HTTPStatus.UNAUTHORIZED
 
-    @unittest_run_loop
     async def test_validate_expired_jwt(self) -> None:
         token_response_obj = await self.perform_auth()
         request = self.jwt_validate_request_schema.dump(JWTValidateRequest(jwt=token_response_obj.jwt))
@@ -205,7 +194,6 @@ class TestServer(AioHTTPTestCase):
 
 
     # Register Key Tests
-    @unittest_run_loop
     async def test_register_key_bad_request(self) -> None:
         # Missing field
         response = await self.client.post("/register_key", json={})
@@ -216,7 +204,6 @@ class TestServer(AioHTTPTestCase):
         response = await self.client.post("/register_key", json=request)
         assert response.status == HTTPStatus.BAD_REQUEST
 
-    @unittest_run_loop
     async def test_register_key_already_registered(self) -> None:
         # Already registered (and still valid) key
         key = await self.register_key()
@@ -232,7 +219,6 @@ class TestServer(AioHTTPTestCase):
 
 
     # Is Key Registered Tests
-    @unittest_run_loop
     async def test_is_key_registered_bad_request(self) -> None:
         # Missing field
         response = await self.client.post("/is_key_registered", json={})
@@ -245,14 +231,12 @@ class TestServer(AioHTTPTestCase):
 
 
     # Validate request tests
-    @unittest_run_loop
     async def test_validate_request(self) -> None:
         token_response_obj = await self.perform_auth()
         headers = {"Authorization": f"Bearer {token_response_obj.jwt}"}
         response = await self.client.get("/validate_request", headers=headers)
         assert response.status == HTTPStatus.OK
 
-    @unittest_run_loop
     async def test_validate_request_expired_token(self) -> None:
         token_response_obj = await self.perform_auth()
         headers = {"Authorization": f"Bearer {token_response_obj.jwt}"}
@@ -262,7 +246,6 @@ class TestServer(AioHTTPTestCase):
             response = await self.client.get("/validate_request", headers=headers)
             assert response.status == HTTPStatus.UNAUTHORIZED
 
-    @unittest_run_loop
     async def test_validate_request_bad_header(self) -> None:
         # No Authorization header
         response = await self.client.get("/validate_request")
@@ -285,12 +268,10 @@ class TestExternalOnlyServer(AioHTTPTestCase):
         self.app = self.api_server.app
         return self.app
 
-    @unittest_run_loop
     async def test_external_api_sanity(self) -> None:
         response = await self.client.post("/validate", json={})
         assert response.status == HTTPStatus.BAD_REQUEST
 
-    @unittest_run_loop
     async def test_disabled_internal_api(self) -> None:
         response = await self.client.post("/register_key", json={})
         assert response.status == HTTPStatus.NOT_FOUND
@@ -310,12 +291,10 @@ class TestInternalOnlyServer(AioHTTPTestCase):
         self.app = self.api_server.app
         return self.app
 
-    @unittest_run_loop
     async def test_internal_api_sanity(self) -> None:
         response = await self.client.post("/register_key", json={})
         assert response.status == HTTPStatus.BAD_REQUEST
 
-    @unittest_run_loop
     async def test_disabled_external_api(self) -> None:
         response = await self.client.post("/authenticate", json={})
         assert response.status == HTTPStatus.NOT_FOUND
@@ -326,7 +305,6 @@ class TestInternalOnlyServer(AioHTTPTestCase):
         response = await self.client.post("/validate", json={})
         assert response.status == HTTPStatus.NOT_FOUND
 
-    @unittest_run_loop
     async def test_health_check(self) -> None:
         response = await self.client.get("/health")
         assert response.status == HTTPStatus.OK
