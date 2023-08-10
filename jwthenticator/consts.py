@@ -34,10 +34,12 @@ RSA_PRIVATE_KEY_PATH = env("RSA_PRIVATE_KEY_PATH", None)
 RSA_KEY_STRENGTH = env.int("RSA_KEY_SIZE", 2048)
 
 # DB consts
-DB_CONNECTOR = env.str("DB_CONNECTOR", "postgresql+asyncpg")
+ASYNC_DB_CONNECTOR = env.str("ASYNC_DB_CONNECTOR", "postgresql+asyncpg")
+DB_CONNECTOR = env.str("DB_CONNECTOR", "postgresql+pg8000")
 DB_USER = env.str("DB_USER", "postgres")
 DB_PASS = env.str("DB_PASS", "")
 DB_HOST = env.str("DB_HOST", "localhost")
 DB_NAME = env.str("DB_NAME", "jwthenticator")
 
 DB_URI = env.str("DB_URI", f"{DB_CONNECTOR}://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}")
+ASYNC_DB_URI = env.str("DB_URI", f"{DB_CONNECTOR}://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}")

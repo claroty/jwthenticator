@@ -11,7 +11,7 @@ from sqlalchemy.orm import sessionmaker
 from jwthenticator.models import RefreshTokenInfo
 from jwthenticator.schemas import JWTPayloadData, RefreshTokenData
 from jwthenticator.exceptions import InvalidTokenError, MissingJWTError
-from jwthenticator.consts import JWT_ALGORITHM, REFRESH_TOKEN_EXPIRY, JWT_LEASE_TIME, JWT_AUDIENCE, DB_URI
+from jwthenticator.consts import JWT_ALGORITHM, REFRESH_TOKEN_EXPIRY, JWT_LEASE_TIME, JWT_AUDIENCE, ASYNC_DB_URI
 
 class TokenManager:
     """
@@ -39,7 +39,7 @@ class TokenManager:
         self.refresh_token_schema = RefreshTokenData.Schema()
         self.jwt_payload_data_schema = JWTPayloadData.Schema()
 
-        self.async_engine = create_async_engine(DB_URI)
+        self.async_engine = create_async_engine(ASYNC_DB_URI)
         self.session_factory = sessionmaker(self.async_engine, expire_on_commit=False, class_=AsyncSession)
 
     async def create_access_token(self, identifier: UUID) -> str:
