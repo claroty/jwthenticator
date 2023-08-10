@@ -23,6 +23,7 @@ marshmallow-dataclass = "^8.3"
 pycryptodomex = "^3.9"
 environs = "^9.3.1"
 asyncpg = "^0.28.0"
+asyncio = "^3.4.3"
 
 
 [tool.poetry.dev-dependencies]
