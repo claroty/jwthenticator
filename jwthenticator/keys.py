@@ -9,7 +9,7 @@ from jwthenticator.utils import create_async_session_factory
 from jwthenticator.schemas import KeyData
 from jwthenticator.models import Base, KeyInfo
 from jwthenticator.exceptions import InvalidKeyError
-from jwthenticator.consts import KEY_EXPIRY, DB_URI
+from jwthenticator.consts import KEY_EXPIRY, ASYNC_DB_URI
 
 
 class KeyManager:
@@ -18,7 +18,7 @@ class KeyManager:
     """
 
     def __init__(self) -> None:
-        self.async_session_factory = create_async_session_factory(DB_URI, Base)
+        self.async_session_factory = create_async_session_factory(ASYNC_DB_URI, Base)
         self.key_schema = KeyData.Schema()
 
 

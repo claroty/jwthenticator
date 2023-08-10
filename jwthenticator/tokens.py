@@ -11,7 +11,7 @@ from jwthenticator.utils import create_async_session_factory
 from jwthenticator.models import Base, RefreshTokenInfo
 from jwthenticator.schemas import JWTPayloadData, RefreshTokenData
 from jwthenticator.exceptions import InvalidTokenError, MissingJWTError
-from jwthenticator.consts import JWT_ALGORITHM, REFRESH_TOKEN_EXPIRY, JWT_LEASE_TIME, JWT_AUDIENCE, DB_URI
+from jwthenticator.consts import JWT_ALGORITHM, REFRESH_TOKEN_EXPIRY, JWT_LEASE_TIME, JWT_AUDIENCE, ASYNC_DB_URI
 
 class TokenManager:
     """
@@ -39,7 +39,7 @@ class TokenManager:
         self.refresh_token_schema = RefreshTokenData.Schema()
         self.jwt_payload_data_schema = JWTPayloadData.Schema()
 
-        self.async_session_factory = create_async_session_factory(DB_URI, Base)
+        self.async_session_factory = create_async_session_factory(ASYNC_DB_URI, Base)
 
     async def create_access_token(self, identifier: UUID) -> str:
         """
