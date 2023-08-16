@@ -5,6 +5,8 @@ from datetime import datetime, timedelta
 from hashlib import sha512
 from uuid import UUID
 
+from sqlalchemy import select
+
 from jwthenticator.utils import create_async_session_factory
 from jwthenticator.schemas import KeyData
 from jwthenticator.models import Base, KeyInfo
@@ -44,7 +46,7 @@ class KeyManager:
         )
         async with self.async_session_factory() as session:
             async with session.begin():
-                await session.add(key_obj)
+                session.add(key_obj)
         return True
 
 
@@ -53,7 +55,9 @@ class KeyManager:
         Check if a key exists in DB.
         """
         async with self.async_session_factory() as session:
-            return await session.query(KeyInfo).filter_by(key_hash=key_hash).count() == 1
+            query = select(KeyInfo.id).where(KeyInfo.key_hash == key_hash)
+            result = await session.execute(query)
+            return len(result.all()) == 1
 
 
     async def update_key_expiry(self, key_hash: str, expires_at: datetime) -> bool:
@@ -75,6 +79,7 @@ class KeyManager:
         if not await self.check_key_exists(key_hash):
             raise InvalidKeyError("Invalid key")
         async with self.async_session_factory() as session:
-            key_info_obj = await session.query(KeyInfo).filter_by(key_hash=key_hash).first()
+            query = select(KeyInfo).where(KeyInfo.key_hash == key_hash)
+            key_info_obj = (await session.execute(query)).scalars().first()
             key_data_obj = self.key_schema.load((self.key_schema.dump(key_info_obj)))
             return key_data_obj

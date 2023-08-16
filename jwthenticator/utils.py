@@ -1,7 +1,6 @@
 from __future__ import absolute_import
 
 import asyncio
-from asyncio import events
 from os.path import isfile
 from typing import Any, Dict, Tuple, Optional
 from urllib.parse import urlparse
@@ -12,6 +11,7 @@ from Cryptodome.Hash import SHA1
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, AsyncEngine
+from sqlalchemy.pool import NullPool
 
 from jwthenticator.consts import RSA_KEY_STRENGTH, RSA_PUBLIC_KEY, RSA_PRIVATE_KEY, RSA_PUBLIC_KEY_PATH, RSA_PRIVATE_KEY_PATH
 
@@ -103,9 +103,8 @@ def fix_url_path(url: str) -> str:
     return url if url.endswith("/") else url + "/"
 
 
-async def init_models(engine: AsyncEngine, base: DeclarativeMeta) -> None:
+async def create_base(engine: AsyncEngine, base: DeclarativeMeta) -> None:
     async with engine.begin() as conn:
-        await conn.run_sync(base.metadata.drop_all)
         await conn.run_sync(base.metadata.create_all)
 
 
@@ -116,8 +115,7 @@ def create_async_session_factory(uri: str, base: Optional[DeclarativeMeta] = Non
     :param engine_kwargs: Arguments to pass to SQLAlchemy's engine initialization
     :returns: :class:`.AsyncSession` factory
     """
-    engine = create_async_engine(uri, **engine_kwargs)
+    engine = create_async_engine(uri, **engine_kwargs, poolclass=NullPool)
     if base is not None:
-        print(events.get_running_loop())
-        asyncio.run(init_models(engine=engine, base=base))  # Create tables
+        asyncio.get_event_loop().run_until_complete(create_base(engine, base))
     return sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)

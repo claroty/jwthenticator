@@ -24,6 +24,7 @@ pycryptodomex = "^3.9"
 environs = "^9.3.1"
 asyncpg = "^0.28.0"
 asyncio = "^3.4.3"
+nest-asyncio = "^1.5.7"
 
 
 [tool.poetry.dev-dependencies]
