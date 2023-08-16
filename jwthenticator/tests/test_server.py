@@ -5,6 +5,7 @@ from uuid import uuid4
 from http import HTTPStatus
 from unittest.mock import MagicMock
 
+import nest_asyncio
 from aiohttp.test_utils import AioHTTPTestCase
 from aiohttp.web import Application
 from jwt import PyJWKClient
@@ -36,6 +37,7 @@ class TestServer(AioHTTPTestCase):
 
 
     def setup_class(self) -> None:
+        nest_asyncio.apply()
         self.auth_request_schema = AuthRequest.Schema()
         self.token_response_schema = TokenResponse.Schema()
         self.refresh_request_schema = RefreshRequest.Schema()

@@ -67,7 +67,8 @@ class KeyManager:
         if not await self.check_key_exists(key_hash):
             raise InvalidKeyError("Invalid key")
         async with self.async_session_factory() as session:
-            key_info_obj = await session.query(KeyInfo).filter_by(key_hash=key_hash).first()
+            query = select(KeyInfo).where(KeyInfo.key_hash == key_hash)
+            key_info_obj = (await session.execute(query)).scalars().first()
             key_info_obj.expires_at = expires_at
         return True
 
