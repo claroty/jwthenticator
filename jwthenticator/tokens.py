@@ -6,7 +6,7 @@ from hashlib import sha512
 from uuid import UUID, uuid4
 
 import jwt
-from sqlalchemy import select
+from sqlalchemy import select, func
 
 from jwthenticator.utils import create_async_session_factory
 from jwthenticator.models import Base, RefreshTokenInfo
@@ -105,9 +105,8 @@ class TokenManager:
         Check if a refresh token exists in DB.
         """
         async with self.async_session_factory() as session:
-            query = select(RefreshTokenInfo).where(RefreshTokenInfo.token == refresh_token)
-            result = (await session.execute(query))
-            return len(result.all()) == 1
+            query = select(func.count(RefreshTokenInfo.id)).where(RefreshTokenInfo.token == refresh_token)
+            return (await session.scalar(query)) == 1
 
 
     async def load_refresh_token(self, refresh_token: str) -> RefreshTokenData:

@@ -23,8 +23,6 @@ marshmallow-dataclass = "^8.3"
 pycryptodomex = "^3.9"
 environs = "^9.3.1"
 asyncpg = "^0.28.0"
-asyncio = "^3.4.3"
-nest-asyncio = "^1.5.7"
 
 
 [tool.poetry.dev-dependencies]
@@ -41,6 +39,9 @@ async_generator = "^1.10"
 aiofiles = "^0.7.0"
 typing-inspect = "0.7.1" # https://github.com/lovasoa/marshmallow_dataclass/issues/206
 
+
+[tool.poetry.group.dev.dependencies]
+nest-asyncio = "^1.5.7"
 
 [tool.pylint.message_control]
 disable = [
