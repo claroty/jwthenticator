@@ -6,12 +6,13 @@ from hashlib import sha512
 from uuid import UUID, uuid4
 
 import jwt
-from asyncalchemy import create_session_factory
+from sqlalchemy import select, func
 
+from jwthenticator.utils import create_async_session_factory
 from jwthenticator.models import Base, RefreshTokenInfo
 from jwthenticator.schemas import JWTPayloadData, RefreshTokenData
 from jwthenticator.exceptions import InvalidTokenError, MissingJWTError
-from jwthenticator.consts import JWT_ALGORITHM, REFRESH_TOKEN_EXPIRY, JWT_LEASE_TIME, JWT_AUDIENCE, DB_URI
+from jwthenticator.consts import JWT_ALGORITHM, REFRESH_TOKEN_EXPIRY, JWT_LEASE_TIME, JWT_AUDIENCE, ASYNC_DB_URI
 
 class TokenManager:
     """
@@ -39,8 +40,7 @@ class TokenManager:
         self.refresh_token_schema = RefreshTokenData.Schema()
         self.jwt_payload_data_schema = JWTPayloadData.Schema()
 
-        self.session_factory = create_session_factory(DB_URI, Base)
-
+        self.async_session_factory = create_async_session_factory(ASYNC_DB_URI, Base)
 
     async def create_access_token(self, identifier: UUID) -> str:
         """
@@ -87,13 +87,15 @@ class TokenManager:
             raise Exception("Refresh token can't be created in the past")
 
         refresh_token_str = sha512(uuid4().bytes).hexdigest()
-        async with self.session_factory() as session:
+        async with self.async_session_factory() as session:
             refresh_token_info_obj = RefreshTokenInfo(
                 expires_at=expires_at,
                 token=refresh_token_str,
                 key_id=key_id
             )
-            await session.add(refresh_token_info_obj)
+            session.add(refresh_token_info_obj)
+            await session.commit()
+            await session.refresh(refresh_token_info_obj)
             await session.flush()
         return refresh_token_str
 
@@ -102,10 +104,9 @@ class TokenManager:
         """
         Check if a refresh token exists in DB.
         """
-        async with self.session_factory() as session:
-            if await session.query(RefreshTokenInfo).filter_by(token=refresh_token).count() == 1:
-                return True
-        return False
+        async with self.async_session_factory() as session:
+            query = select(func.count(RefreshTokenInfo.id)).where(RefreshTokenInfo.token == refresh_token)
+            return (await session.scalar(query)) == 1
 
 
     async def load_refresh_token(self, refresh_token: str) -> RefreshTokenData:
@@ -114,7 +115,8 @@ class TokenManager:
         """
         if not await self.check_refresh_token_exists(refresh_token):
             raise InvalidTokenError("Invalid refresh token")
-        async with self.session_factory() as session:
-            refresh_token_info_obj = await session.query(RefreshTokenInfo).filter_by(token=refresh_token).first()
-            refresh_token_data_obj = self.refresh_token_schema.load(self.refresh_token_schema.dump(refresh_token_info_obj))
+        async with self.async_session_factory() as session:
+            query = select(RefreshTokenInfo).where(RefreshTokenInfo.token == refresh_token)
+            refresh_token_info_obj = (await session.execute(query)).first()
+            refresh_token_data_obj = self.refresh_token_schema.load(self.refresh_token_schema.dump(refresh_token_info_obj[0]))
             return refresh_token_data_obj

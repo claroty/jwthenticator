@@ -1,12 +1,17 @@
 from __future__ import absolute_import
 
+import asyncio
 from os.path import isfile
-from typing import Tuple, Optional
+from typing import Any, Dict, Tuple, Optional
 from urllib.parse import urlparse
 
 from jwt.utils import base64url_encode
 from Cryptodome.PublicKey import RSA
 from Cryptodome.Hash import SHA1
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import DeclarativeMeta
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, AsyncEngine
+from sqlalchemy.pool import NullPool
 
 from jwthenticator.consts import RSA_KEY_STRENGTH, RSA_PUBLIC_KEY, RSA_PRIVATE_KEY, RSA_PUBLIC_KEY_PATH, RSA_PRIVATE_KEY_PATH
 
@@ -96,3 +101,21 @@ def fix_url_path(url: str) -> str:
     the path will be removed by urljoin.
     """
     return url if url.endswith("/") else url + "/"
+
+
+async def create_base(engine: AsyncEngine, base: DeclarativeMeta) -> None:
+    async with engine.begin() as conn:
+        await conn.run_sync(base.metadata.create_all)
+
+
+def create_async_session_factory(uri: str, base: Optional[DeclarativeMeta] = None, **engine_kwargs: Dict[Any, Any]) -> sessionmaker:
+    """
+    :param uri: Database uniform resource identifier
+    :param base: Declarative SQLAlchemy class to base off table initialization
+    :param engine_kwargs: Arguments to pass to SQLAlchemy's engine initialization
+    :returns: :class:`.AsyncSession` factory
+    """
+    engine = create_async_engine(uri, **engine_kwargs, poolclass=NullPool)
+    if base is not None:
+        asyncio.get_event_loop().run_until_complete(create_base(engine, base))
+    return sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)

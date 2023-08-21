@@ -8,6 +8,7 @@ from http import HTTPStatus
 from typing import Union
 from unittest.mock import patch
 
+import nest_asyncio
 from aiohttp import web, ClientSession
 from aiohttp.client import ClientSession as ClientSessionType
 from aiohttp.test_utils import AioHTTPTestCase, TestClient
@@ -21,6 +22,7 @@ SERVER_PORT = 8090
 SERVER_HOST = "127.0.0.1"
 SERVER_URL = f"http://{SERVER_HOST}:{SERVER_PORT}"
 CLIENT_PATCH_FILES = ["client.py"]
+nest_asyncio.apply()
 
 
 @authenticate(SERVER_URL)
