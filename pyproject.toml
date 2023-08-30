@@ -22,7 +22,7 @@ marshmallow = "^3.9"
 marshmallow-dataclass = "^8.3"
 pycryptodomex = "^3.9"
 environs = "^9.3.1"
-asyncpg = "^0.28.0"
+asyncpg = { version = "^0.28.0", markers = "platform_python_implementation == 'CPython'" }
 
 
 [tool.poetry.dev-dependencies]
