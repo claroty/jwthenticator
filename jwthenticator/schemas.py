@@ -37,7 +37,7 @@ class KeyData:
     created: datetime
     expires_at: datetime
     key_hash: str
-    key: Optional[str] = field(default=None, repr=False, metadata=dict(load_only=True))
+    key: Optional[str] = field(default=None, repr=False, metadata={"load_only": True})
 
     async def is_valid(self) -> bool:
         return self.expires_at > datetime.utcnow()

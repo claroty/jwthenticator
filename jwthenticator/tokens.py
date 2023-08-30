@@ -28,7 +28,7 @@ class TokenManager:
         """
         # This is done to avoid an "exploit" where algorithm=none leaving the jwt tokens unsecure.
         if not algorithm or algorithm.lower() == "none":
-            raise Exception("Algorithm can't be empty!")
+            raise ValueError("Algorithm can't be empty!")
 
         self.public_key = public_key
         self.private_key = private_key
@@ -49,7 +49,7 @@ class TokenManager:
         :return: The new JWT token string
         """
         if self.private_key is None:
-            raise Exception("Private key required for JWT token creation")
+            raise RuntimeError("Private key required for JWT token creation")
         utc_now = datetime.utcnow()
         payload = JWTPayloadData(
             token_id=uuid4(),
@@ -84,7 +84,7 @@ class TokenManager:
         if expires_at is None:
             expires_at = expires_at = datetime.utcnow() + timedelta(seconds=REFRESH_TOKEN_EXPIRY)
         if expires_at <= datetime.utcnow():
-            raise Exception("Refresh token can't be created in the past")
+            raise RuntimeError("Refresh token can't be created in the past")
 
         refresh_token_str = sha512(uuid4().bytes).hexdigest()
         async with self.async_session_factory() as session:
