@@ -129,7 +129,7 @@ class Client:
         :return: None or raises exception if fails.
         """
         if self._key is None:
-            raise ValueError("Missing key")
+            raise TypeError("Missing key")
 
         url = urljoin(self.jwthenticator_server, "authenticate")
         request = schemas.AuthRequest(self._key, self.identifier)
