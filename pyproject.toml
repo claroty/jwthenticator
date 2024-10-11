@@ -21,7 +21,7 @@ cryptography = "==42.0.8"  # Required for pyjwt
 marshmallow = "^3.9"
 marshmallow-dataclass = "^8.3"
 pycryptodomex = "^3.9"
-environs = "^9.3.1"
+environs = "^11.0.0"
 asyncpg = { version = "^0.28.0", markers = "platform_python_implementation == 'CPython'" } # pypy can not build asyncpg
 
 

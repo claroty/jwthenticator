@@ -8,8 +8,7 @@ from urllib.parse import urlparse
 from jwt.utils import base64url_encode
 from Cryptodome.PublicKey import RSA
 from Cryptodome.Hash import SHA1
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import DeclarativeMeta
+from sqlalchemy.orm import sessionmaker, DeclarativeMeta
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, AsyncEngine
 from sqlalchemy.pool import NullPool
 
