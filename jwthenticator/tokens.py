@@ -105,7 +105,7 @@ class TokenManager:
         Check if a refresh token exists in DB.
         """
         async with self.async_session_factory() as session:
-            query = select(func.count(RefreshTokenInfo.id)).where(RefreshTokenInfo.token == refresh_token)
+            query = select(func.count(RefreshTokenInfo.id)).where(RefreshTokenInfo.token == refresh_token) # pylint: disable=not-callable
             return (await session.scalar(query)) == 1
 
 
