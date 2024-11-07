@@ -2,14 +2,18 @@ from __future__ import absolute_import
 
 import asyncio
 from os.path import isfile
-from typing import Any, Dict, Tuple, Optional, Type
+from typing import Any, Dict, Tuple, Optional
 from urllib.parse import urlparse
 
 from jwt.utils import base64url_encode
 from Cryptodome.PublicKey import RSA
 from Cryptodome.Hash import SHA1
-from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, AsyncEngine, async_sessionmaker
+try:
+    # TODO: Remove this try-except block when we drop support for sqlalchemy < 2.0 # pylint: disable=fixme
+    from sqlalchemy.ext.asyncio import async_sessionmaker
+except ImportError:
+    from sqlalchemy.orm import sessionmaker as async_sessionmaker   # type:ignore
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, AsyncEngine
 from sqlalchemy.pool import NullPool
 
 from jwthenticator.consts import RSA_KEY_STRENGTH, RSA_PUBLIC_KEY, RSA_PRIVATE_KEY, RSA_PUBLIC_KEY_PATH, RSA_PRIVATE_KEY_PATH
@@ -101,13 +105,13 @@ def fix_url_path(url: str) -> str:
     """
     return url if url.endswith("/") else url + "/"
 
-
-async def create_base(engine: AsyncEngine, base: Type[DeclarativeBase]) -> None:
+# TODO: Add proper typing when we drop support for sqlalchemy < 2.0 # pylint: disable=fixme
+async def create_base(engine: AsyncEngine, base: Any) -> None:
     async with engine.begin() as conn:
         await conn.run_sync(base.metadata.create_all)
 
-
-def create_async_session_factory(uri: str, base: Optional[Type[DeclarativeBase]] = None, **engine_kwargs: Dict[Any, Any]) -> async_sessionmaker[AsyncSession]:
+# TODO: Add proper typing when we drop support for sqlalchemy < 2.0 # pylint: disable=fixme
+def create_async_session_factory(uri: str, base: Optional[Any] = None, **engine_kwargs: Dict[Any, Any]) -> Any:
     """
     :param uri: Database uniform resource identifier
     :param base: Declarative SQLAlchemy class to base off table initialization
