@@ -5,8 +5,7 @@ from typing import Any
 from datetime import datetime
 
 from sqlalchemy import create_engine, Column, Integer, String, DateTime, ForeignKey
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy_utils import database_exists, create_database
 from sqlalchemy_utils.types.uuid import UUIDType
 
@@ -24,7 +23,7 @@ class KeyInfo(Base):
     created = Column(DateTime, default=datetime.utcnow())
     expires_at = Column(DateTime)
     key_hash = Column(String(256), unique=True)
-    identifier = Column(UUIDType(binary=False), nullable=False)
+    identifier = Column(UUIDType(binary=False), nullable=False) # type: ignore
 
 
 class RefreshTokenInfo(Base):

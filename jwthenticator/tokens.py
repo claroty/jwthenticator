@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from hashlib import sha512
 from uuid import UUID, uuid4
 
+import logging
 import jwt
 from sqlalchemy import select, func
 
@@ -70,7 +71,11 @@ class TokenManager:
         """
         if not token_string:
             raise MissingJWTError
-        token_dict: dict = jwt.decode(token_string, self.public_key, algorithms=[self.algorithm], options={"verify_exp": False})
+        try:
+            token_dict: dict = jwt.decode(token_string, self.public_key, algorithms=[self.algorithm], options={"verify_exp": False})
+        except Exception:
+            logging.error("Exception occured during token decode. Token %s", token_string)
+            raise
         token_data = self.jwt_payload_data_schema.load(token_dict)
         return token_data
 
@@ -105,7 +110,7 @@ class TokenManager:
         Check if a refresh token exists in DB.
         """
         async with self.async_session_factory() as session:
-            query = select(func.count(RefreshTokenInfo.id)).where(RefreshTokenInfo.token == refresh_token)
+            query = select(func.count(RefreshTokenInfo.id)).where(RefreshTokenInfo.token == refresh_token) # pylint: disable=not-callable
             return (await session.scalar(query)) == 1
 
 

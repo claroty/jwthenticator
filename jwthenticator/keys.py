@@ -55,7 +55,7 @@ class KeyManager:
         Check if a key exists in DB.
         """
         async with self.async_session_factory() as session:
-            query = select(func.count(KeyInfo.id)).where(KeyInfo.key_hash == key_hash)
+            query = select(func.count(KeyInfo.id)).where(KeyInfo.key_hash == key_hash) # pylint: disable=not-callable
             return (await session.scalar(query)) == 1
 
 

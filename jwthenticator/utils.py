@@ -8,8 +8,10 @@ from urllib.parse import urlparse
 from jwt.utils import base64url_encode
 from Cryptodome.PublicKey import RSA
 from Cryptodome.Hash import SHA1
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import DeclarativeMeta
+try:
+    from sqlalchemy.ext.asyncio import async_sessionmaker
+except ImportError:
+    from sqlalchemy.orm import sessionmaker as async_sessionmaker   # type:ignore
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, AsyncEngine
 from sqlalchemy.pool import NullPool
 
@@ -102,13 +104,11 @@ def fix_url_path(url: str) -> str:
     """
     return url if url.endswith("/") else url + "/"
 
-
-async def create_base(engine: AsyncEngine, base: DeclarativeMeta) -> None:
+async def create_base(engine: AsyncEngine, base: Any) -> None:
     async with engine.begin() as conn:
         await conn.run_sync(base.metadata.create_all)
 
-
-def create_async_session_factory(uri: str, base: Optional[DeclarativeMeta] = None, **engine_kwargs: Dict[Any, Any]) -> sessionmaker:
+def create_async_session_factory(uri: str, base: Optional[Any] = None, **engine_kwargs: Dict[Any, Any]) -> Any:
     """
     :param uri: Database uniform resource identifier
     :param base: Declarative SQLAlchemy class to base off table initialization
@@ -118,4 +118,4 @@ def create_async_session_factory(uri: str, base: Optional[DeclarativeMeta] = Non
     engine = create_async_engine(uri, **engine_kwargs, poolclass=NullPool)
     if base is not None:
         asyncio.get_event_loop().run_until_complete(create_base(engine, base))
-    return sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
+    return async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
