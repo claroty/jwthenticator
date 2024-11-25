@@ -5,6 +5,7 @@ from os.path import isfile
 from typing import Any, Dict, Tuple, Optional
 from urllib.parse import urlparse
 
+from datetime import datetime, timezone
 from jwt.utils import base64url_encode
 from Cryptodome.PublicKey import RSA
 from Cryptodome.Hash import SHA1
@@ -119,3 +120,6 @@ def create_async_session_factory(uri: str, base: Optional[Any] = None, **engine_
     if base is not None:
         asyncio.get_event_loop().run_until_complete(create_base(engine, base))
     return async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
+
+def utcnow() -> datetime:
+    return datetime.now(timezone.utc)
