@@ -9,7 +9,6 @@ from jwt.utils import base64url_encode
 from Cryptodome.PublicKey import RSA
 from Cryptodome.Hash import SHA1
 try:
-    # TODO: Remove this try-except block when we drop support for sqlalchemy < 2.0 # pylint: disable=fixme
     from sqlalchemy.ext.asyncio import async_sessionmaker
 except ImportError:
     from sqlalchemy.orm import sessionmaker as async_sessionmaker   # type:ignore
@@ -105,12 +104,10 @@ def fix_url_path(url: str) -> str:
     """
     return url if url.endswith("/") else url + "/"
 
-# TODO: Add proper typing when we drop support for sqlalchemy < 2.0 # pylint: disable=fixme
 async def create_base(engine: AsyncEngine, base: Any) -> None:
     async with engine.begin() as conn:
         await conn.run_sync(base.metadata.create_all)
 
-# TODO: Add proper typing when we drop support for sqlalchemy < 2.0 # pylint: disable=fixme
 def create_async_session_factory(uri: str, base: Optional[Any] = None, **engine_kwargs: Dict[Any, Any]) -> Any:
     """
     :param uri: Database uniform resource identifier

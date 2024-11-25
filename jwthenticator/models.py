@@ -14,7 +14,6 @@ from jwthenticator.consts import DB_URI
 engine = create_engine(DB_URI)
 SessionMaker = sessionmaker(bind=engine)
 
-# TODO: Add proper typing when we drop support for sqlalchemy < 2.0 # pylint: disable=fixme
 Base = declarative_base()   # type: Any # pylint: disable=invalid-name
 
 
