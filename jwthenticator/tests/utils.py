@@ -5,7 +5,7 @@ import functools
 import random
 from os import environ
 from string import ascii_letters
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from hashlib import sha512
 from uuid import uuid4
 

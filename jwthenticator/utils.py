@@ -2,18 +2,16 @@ from __future__ import absolute_import
 
 import asyncio
 from os.path import isfile
-from typing import Any, Dict, Tuple, Optional
+from typing import Any, Dict, Tuple, Optional, Type
 from urllib.parse import urlparse
 
 from datetime import datetime, timezone
 from jwt.utils import base64url_encode
 from Cryptodome.PublicKey import RSA
 from Cryptodome.Hash import SHA1
-try:
-    from sqlalchemy.ext.asyncio import async_sessionmaker
-except ImportError:
-    from sqlalchemy.orm import sessionmaker as async_sessionmaker   # type:ignore
+from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, AsyncEngine
+from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.pool import NullPool
 
 from jwthenticator.consts import RSA_KEY_STRENGTH, RSA_PUBLIC_KEY, RSA_PRIVATE_KEY, RSA_PUBLIC_KEY_PATH, RSA_PRIVATE_KEY_PATH
@@ -105,11 +103,11 @@ def fix_url_path(url: str) -> str:
     """
     return url if url.endswith("/") else url + "/"
 
-async def create_base(engine: AsyncEngine, base: Any) -> None:
+async def create_base(engine: AsyncEngine, base: Type[DeclarativeBase]) -> None:
     async with engine.begin() as conn:
         await conn.run_sync(base.metadata.create_all)
 
-def create_async_session_factory(uri: str, base: Optional[Any] = None, **engine_kwargs: Dict[Any, Any]) -> Any:
+def create_async_session_factory(uri: str, base: Optional[Type[DeclarativeBase]] = None, **engine_kwargs: Dict[Any, Any]) -> async_sessionmaker[AsyncSession]:
     """
     :param uri: Database uniform resource identifier
     :param base: Declarative SQLAlchemy class to base off table initialization

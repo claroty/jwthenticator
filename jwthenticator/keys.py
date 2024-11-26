@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 from typing import Optional
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from hashlib import sha512
 from uuid import UUID
 
