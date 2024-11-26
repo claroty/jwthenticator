@@ -50,7 +50,7 @@ class KeyInfo(Base):
     __tablename__ = "keys"
     id = mapped_column(Integer, primary_key=True, autoincrement=True)
     key_hash = mapped_column(String(256), unique=True)
-    identifier = mapped_column(UUIDType(binary=False), nullable=False) # type: ignore
+    identifier = mapped_column(UUIDType(binary=False), nullable=False)
 
 
 class RefreshTokenInfo(Base):
