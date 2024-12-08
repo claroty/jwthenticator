@@ -18,8 +18,8 @@ from jwthenticator.tests.utils import random_key, hash_key
 @pytest.fixture
 def set_timezone()-> Generator[Callable[[str], None], None, None]:
     original_tz = os.environ.get('TZ')
-    def change_timezone(tz: str) -> None:
-        os.environ['TZ'] = tz
+    def change_timezone(time_zone: str) -> None:
+        os.environ['TZ'] = time_zone
         time.tzset()  # Update the timezone for the process
     yield change_timezone
     # Restore the original timezone
@@ -60,7 +60,7 @@ class TestTokens:
 
     # Create access token tests
     @pytest.mark.asyncio
-    async def test_create_access_token(self, set_timezone: Callable[[str], None]) -> None:
+    async def test_create_access_token(self, set_timezone: Callable[[str], None]) -> None: # pylint: disable=redefined-outer-name
         uuid = uuid4()
         time_now = utcnow()
         time_now_timestamp = int(time_now.timestamp())
