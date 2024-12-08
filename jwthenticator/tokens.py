@@ -9,7 +9,7 @@ import logging
 import jwt
 from sqlalchemy import select, func
 
-from jwthenticator.utils import create_async_session_factory
+from jwthenticator.utils import create_async_session_factory, utcnow
 from jwthenticator.models import Base, RefreshTokenInfo
 from jwthenticator.schemas import JWTPayloadData, RefreshTokenData
 from jwthenticator.exceptions import InvalidTokenError, MissingJWTError
@@ -51,7 +51,7 @@ class TokenManager:
         """
         if self.private_key is None:
             raise RuntimeError("Private key required for JWT token creation")
-        utc_now = datetime.utcnow()
+        utc_now = utcnow()
         payload = JWTPayloadData(
             token_id=uuid4(),
             identifier=identifier,
@@ -87,8 +87,8 @@ class TokenManager:
         :return: The refresh token created.
         """
         if expires_at is None:
-            expires_at = expires_at = datetime.utcnow() + timedelta(seconds=REFRESH_TOKEN_EXPIRY)
-        if expires_at <= datetime.utcnow():
+            expires_at = expires_at = utcnow() + timedelta(seconds=REFRESH_TOKEN_EXPIRY)
+        if expires_at <= utcnow():
             raise RuntimeError("Refresh token can't be created in the past")
 
         refresh_token_str = sha512(uuid4().bytes).hexdigest()

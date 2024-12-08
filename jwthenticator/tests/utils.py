@@ -32,7 +32,7 @@ async def hash_key(key: str) -> str:
 
 
 async def future_datetime(seconds: int = 0) -> datetime:
-    return datetime.utcnow() + timedelta(seconds=seconds)
+    return utils.utcnow() + timedelta(seconds=seconds)
 
 
 def backup_environment(func):  # type: ignore

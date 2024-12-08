@@ -1,7 +1,6 @@
 from __future__ import absolute_import
 
 from typing import Optional, Any, Dict
-from datetime import datetime
 from urllib.parse import urljoin
 from http import HTTPStatus
 from uuid import UUID
@@ -10,7 +9,7 @@ import jwt as pyjwt # To avoid redfinition in class
 from aiohttp import ClientSession, ClientResponse
 
 from jwthenticator import schemas, exceptions
-from jwthenticator.utils import verify_url, fix_url_path
+from jwthenticator.utils import verify_url, fix_url_path, utcnow
 from jwthenticator.consts import JWT_ALGORITHM
 
 JWT_DECODE_OPTIONS = {"verify_signature": False, "verify_exp": False}
@@ -82,7 +81,7 @@ class Client:
     def is_jwt_expired(self) -> bool:
         if self._jwt_exp is None:
             return True
-        return datetime.utcnow().timestamp() >= self._jwt_exp
+        return utcnow().timestamp() >= self._jwt_exp
 
     @property
     def refresh_token(self) -> Optional[str]:
