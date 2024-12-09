@@ -11,6 +11,7 @@ from marshmallow import Schema, fields, post_dump
 from marshmallow_dataclass import dataclass, NewType, add_schema
 
 from jwthenticator.consts import JWT_ALGORITHM, JWT_ALGORITHM_FAMILY
+from jwthenticator.utils import utcnow
 
 # Define the UUID type that uses Marshmallow's UUID + Python's UUID
 UUID = NewType("UUID", uuid.UUID, field=fields.UUID)
@@ -40,7 +41,7 @@ class KeyData:
     key: Optional[str] = field(default=None, repr=False, metadata={"load_only": True})
 
     async def is_valid(self) -> bool:
-        return self.expires_at > datetime.utcnow()
+        return self.expires_at > utcnow()
 
 
 @dataclass
@@ -53,7 +54,7 @@ class RefreshTokenData:
     key_id: int
 
     async def is_valid(self) -> bool:
-        return self.expires_at > datetime.utcnow()
+        return self.expires_at > utcnow()
 
 
 # Skipping None values on dump since 'aud' is optional and can't be None/empty
@@ -68,8 +69,7 @@ class JWTPayloadData:
     aud: Optional[List[str]] = None   # JWT Audience
 
     async def is_valid(self) -> bool:
-        return self.exp > datetime.utcnow().timestamp()
-
+        return self.exp > utcnow().timestamp()
 
 # Request dataclasses
 @dataclass
