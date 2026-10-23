@@ -43,7 +43,7 @@ class JWThenticatorAPI:
     async def authenticate(self, request: schemas.AuthRequest) -> schemas.TokenResponse:
         """
         Authenticate using a key.
-        :return: access + refresh tokens if successfull
+        :return: access + refresh tokens if successful
         """
         key_hash = sha512(request.key.encode()).hexdigest()
         key_obj = await self.key_manager.get_key(key_hash)
@@ -107,7 +107,7 @@ class JWThenticatorAPI:
 
     async def get_jwks(self) -> schemas.JWKSResponse:
         """
-        Get the JWKS requried for authentication.
+        Get the JWKS required for authentication.
         See here for more details: https://auth0.com/docs/tokens/references/jwks-properties
         """
         rsa_obj = RSA.import_key(self.public_key)
