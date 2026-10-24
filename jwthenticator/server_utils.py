@@ -16,7 +16,7 @@ def authenticate(jwthenticator_server: str) -> Any:
     """
     Wrapper function to verify user performing the request is authorized.
     The function extracts the JWT token from the header and verifies it against
-        an jwthenticator server (given by jwthenticator_server).
+        a jwthenticator server (given by jwthenticator_server).
     Use it to wrap async endpoints that require authentication.
     :param jwthenticator_server: The (full) URL of the jwthenticator server.
         For example - http://localhost.
@@ -50,7 +50,7 @@ def authenticate(jwthenticator_server: str) -> Any:
 
 async def verify_jwt(jwthenticator_server: str, jwt: str) -> bool:
     """
-    Verify agains jwthenticator server that the given JWT is valid.
+    Verify against jwthenticator server that the given JWT is valid.
     :return bool: True if valid, False if isn't.
     """
     if not jwthenticator_server.endswith("/"):

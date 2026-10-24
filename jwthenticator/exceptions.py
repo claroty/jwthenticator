@@ -55,5 +55,5 @@ class BadAuthorizationError(Exception):
 
 class MissingJWTError(Exception):
     """
-    Raised if JWT is misisng.
+    Raised if JWT is missing.
     """

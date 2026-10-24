@@ -27,7 +27,7 @@ class TokenManager:
         Accepts public + private key pairs.
         If only public key is given tokens can be loaded but not created.
         """
-        # This is done to avoid an "exploit" where algorithm=none leaving the jwt tokens unsecure.
+        # This is done to avoid an "exploit" where algorithm=none leaving the jwt tokens insecure.
         if not algorithm or algorithm.lower() == "none":
             raise ValueError("Algorithm can't be empty!")
 
@@ -74,7 +74,7 @@ class TokenManager:
         try:
             token_dict: dict = jwt.decode(token_string, self.public_key, algorithms=[self.algorithm], options={"verify_exp": False})
         except Exception:
-            logging.error("Exception occured during token decode. Token %s", token_string)
+            logging.error("Exception occurred during token decode. Token %s", token_string)
             raise
         token_data = self.jwt_payload_data_schema.load(token_dict)
         return token_data
